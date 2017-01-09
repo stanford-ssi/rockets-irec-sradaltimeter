@@ -6,14 +6,9 @@
 #include <Adafruit_BMP280.h>
 #include "Flight_Configuration.h"
 #include "Salt_Rev0.h"
-#include "Flight_Data.h"
-#include "Flight_Sensors.h"
-#include "Flight_Events.h"
-
-/* global objects */
-Flight_Sensors 	flight_sensors;
-Flight_Data			flight_data;
-Flight_Events		flight_events;
+#include "Altimeter.h"
+/* global object */
+Altimeter  altimeter;
 
 /* global variables */
 uint16_t flight_state = STRTUP;
@@ -28,12 +23,12 @@ int main(void)
 {
 	startup();
 	while(true){
-		if(flight_events.check(EVENT_MAIN)){
+		if(altimeter.flight_events.check(EVENT_MAIN)){
 			mainUpdate();
 		}
 
-		if(flight_events.check(EVENT_READ_BMP)){
-			flight_data.updatePressure(flight_sensors.readPressure());
+		if(altimeter.flight_events.check(EVENT_READ_BMP)){
+			altimeter.flight_data.updatePressure(altimeter.flight_sensors.readPressure());
 		}
 	}
 }
@@ -57,11 +52,11 @@ void startup(){
 	pinMode(TRIG_3, OUTPUT);
 	pinMode(TRIG_4, OUTPUT);
 
-	flight_sensors.initialize();
+	altimeter.flight_sensors.initialize();
 	//
 	Serial.begin(9600);
 	flight_state = IDLE;
-	flight_events.initialize();
+	altimeter.flight_events.initialize();
 }
 
 void mainUpdate(){
