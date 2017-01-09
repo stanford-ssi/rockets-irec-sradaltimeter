@@ -44,15 +44,16 @@ The main event flags are triggered interupt timers. These timers inturrupt on co
 
 `Altitude_Kalman_Filter` - Custom kalman filter class for determining altitude. Stores all the relevant constants for the filter as well as the previous filter value. Contains all methods needed for filter update. 
 
-Global Variables and Objects
+#### Global Variables and Objects
 
 flight_data: Object of type Flight_Data that stores all of the relevant data values for the flight. 
 flight_sensors: Object of type Flight_Sensors that interfaces with all sensors
 flight_state: Integer that contains the enumerated flight state values
 
-Files
+#### Non-Class Files
 
-`S-ALT_REV0.h` header file for the board. Contains all pin definitions and any layout specific values
+`S-ALT_REV0.h` - header file for the board. Contains all pin definitions and any layout specific values
+`Flight_Configurations.h` - header file that defines enumerated list and structures or various things within the board.
 
 
 
