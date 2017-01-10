@@ -36,6 +36,8 @@ The main event flags are triggered interupt timers. These timers inturrupt on co
 
 #### Classes
 
+`Altimeter` - this is the primary class for the board and contains all of the other classes as members. Everything is initialized in this class
+
 `Flight_Data` - this class stores the raw data values that are read from each sensor. It also also contains the methods for logging to SD card and has a member object that is the Kalman Filter object. Supports reading sensors at different frequencies. Does not store history.
 
 `Flight_Sensors` - this class is used for accessing all of the sensors and reading GPIO inputs. Is kept separate from Flight_Data class, as use of this object can be easily swapped out for one for a Hardware-In-The-Loop test object
@@ -44,31 +46,18 @@ The main event flags are triggered interupt timers. These timers inturrupt on co
 
 `Altitude_Kalman_Filter` - Custom kalman filter class for determining altitude. Stores all the relevant constants for the filter as well as the previous filter value. Contains all methods needed for filter update. 
 
-#### Global Variables and Objects
+#### Members of `Altimeter` class
 
 flight_data: Object of type Flight_Data that stores all of the relevant data values for the flight. 
 flight_sensors: Object of type Flight_Sensors that interfaces with all sensors
+flight_events: Object of type Flight_Events that contians the 4 interrupt timers
+
 flight_state: Integer that contains the enumerated flight state values
+*more to add below* 
+
 
 #### Non-Class Files
 
-`S-ALT_REV0.h` - header file for the board. Contains all pin definitions and any layout specific values
-`Flight_Configurations.h` - header file that defines enumerated list and structures or various things within the board.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+`S-ALT_REV0.h` - header file for the board. Contains all pin definitions and any pcb layout specific values
+`Flight_Configurations.h` - header file that defines enumerated list and structures or various things within the project.
 
