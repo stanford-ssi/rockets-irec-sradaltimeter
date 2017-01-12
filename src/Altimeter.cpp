@@ -13,7 +13,6 @@ void Altimeter::manageEvents(){
   if(flight_events.check(EVENT_READ_BMP)){
     flight_data.updatePressure(flight_sensors.readPressure());
   }
-
 }
 
 /*
@@ -53,10 +52,12 @@ void Altimeter::mainUpdate(){
       manageLEDs();
       manageBuzzer();
       flight_data.updateESense(flight_sensors.readESense());
+      break;
     case ARMED:
       break;
     }
 }
+
 /*
 This function manages the LED's of the altimeter. will be expanded in the future,
 maybe made into a full object. right now it simple incrementally blinks the 4 LEDS
