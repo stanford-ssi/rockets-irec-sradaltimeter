@@ -1,8 +1,11 @@
 # rockets-irec-sradaltimeter
 
-Code to run on the embedded processor of the SRAD altimeter.
+Code to run on the embedded processor of the SSI SRAD altimeter.
 
 I'm sorry this readme doesn have spellcheck so gg.
+
+### Hardware overview
+For information on the hardware running on the 
 
 ### Flight States
 The altimeter operates in discrete states that dictate the majority of the actions of the processor. However it is not in statemachine as the entirety of the unit is not determined solely by state and input.
@@ -49,6 +52,7 @@ The main event flags are triggered interupt timers. These timers inturrupt on co
 
 `Flight_Data` - this class stores the raw data values that are read from each sensor. It also also contains the methods for logging to SD card and has a member object that is the Kalman Filter object. Supports reading sensors at different frequencies. Does not store history, but probably will be updated in the future so that maybe the past 100 or so values are kept in ram.
 
+
 `Flight_Sensors` - this class is used for accessing all of the sensors and reading GPIO inputs. Is kept separate from Flight_Data class, as use of this object can be easily swapped out for one for a Hardware-In-The-Loop test object
 
 `Flight_Events` - Object of this class contains the 4 internal interrupt timers, as well as any other pin-driven interrupts, that can be used to time events properly. 
@@ -69,4 +73,21 @@ flight_state: Integer that contains the enumerated flight state values
 
 `S-ALT_REV0.h` - header file for the board. Contains all pin definitions and any pcb layout specific values
 `Flight_Configurations.h` - header file that defines enumerated list and structures or various things within the project.
+
+### Implementation Detials
+
+#### SD Data storage
+
+In the root directory of the SD card, a new folder should be generated to store files for each flight, numbered incrementally as `flight_[number]`. So, if the altimeter boots up and sees that the folders `\fight_1` and `\flight_2`, it should create a folder `flight_3` to log data in. 
+
+Within the folder for the flight, the altimeter should create a .csv file for each sensor souce. So, it will contain `MMA.csv`, `BNO.csv`, `BMP.csv`, `esense.csv`, and `gps.csv` (and any others that I may have forgotten). Each line of each sensor file will be of the format: `[time stamp], [data field 1], [data feild 2], ... `. Sensor readings are kept in searate files for better organization and to support writing sensor data at different frequencies (if it turn out that opening/closing files is time consuming, then things will be logged in a single file with an idicator for which sensor it was on each line).
+
+For normal opperations the altimeter should not log data to the SD card untill after it reaches the `liftoff` state (to prevent excessive folder generation when the altimeter is simply just powered on). However, in the tesing phase for data collection purposes, it should start logging data immediatly. 
+
+#### RAM data storage
+
+To keep a history of sensor information in the ram, each sensors should have circular array of variable length so store readings in. The storage should support the following functionaliy:
+- Changing the length of the array for each sensor
+- Store data at a fraction of the frequency it is sampled at (so if the accelerometer is sampled at 50Hz, it can be stored in ram at only say 10Hz, so that a longer history can be kept without taking up too much memory). However it should still be able to store at the same freqency that it is sampled if desired
+- methods for retriving data given the sensor, and the nearest number of milisecons/microseconds in the past it was logged.
 
