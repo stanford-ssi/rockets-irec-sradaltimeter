@@ -33,20 +33,20 @@ Date: 1-6-2017
 #define ISO_SENSE_22  25
 #define ISO_SENSE_23  24
 
-#define TRIG_1        21
-#define TRIG_2        20
-#define TRIG_3        14
-#define TRIG_4        15
-#define ESENSE_1      22
-#define ESENSE_2      33
-#define ESENSE_3      16
-#define ESENSE_4      17
+#define TRIG_1        20
+#define TRIG_2        21
+#define TRIG_3        15
+#define TRIG_4        14
+#define ESENSE_1      33
+#define ESENSE_2      22
+#define ESENSE_3      17
+#define ESENSE_4      16
 
 #define VSENSE        A10
 
 /* Values */
 
-#define VBAT_RATIO    (10/15)
+#define VBAT_RATIO    (10.0/15.0)
 
 
 #endif

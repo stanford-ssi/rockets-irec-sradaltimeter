@@ -12,6 +12,7 @@ Date: 1-6-2017
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 #include <Adafruit_BMP280.h>
+#include <ADC.h>
 #include "Salt_Rev0.h"
 #include "Flight_Configuration.h"
 
@@ -24,12 +25,12 @@ public:
   bool* readESense();
   bool* readIsoSense();
   Bmp_Data* readPressure();
+  float readVbat();
 
 private:
   Adafruit_BMP280 bmp1;
   Adafruit_BMP280 bmp2;
   Adafruit_BNO055 bno;
-  ADC* adc;
 };
 
 

@@ -8,8 +8,14 @@ Date: 1-6-2017
 #ifndef FLIGHT_CONFIGURATION_H
 #define FLIGHT_CONFIGURATION_H
 
-#define UPDATE_FREQUENCY              //will use these definitions in the futre
-#define BUZZER_FREQUENCY              //
+#define UPDATE_FREQ_HZ      30       //frequency of the main update
+#define BEEP_FREQ_HZ        4        //frequency that the buzzer will beep at
+
+
+/*tone settings for the buzzer */
+#define BUZZ_TONE_HIGH      5000
+#define BUZZ_TONE_MID       4000
+#define BUZZ_TONE_LOW       3000
 
 
 
@@ -35,6 +41,8 @@ enum {
   EVENT_READ_GPS =  0b00010000,
 };
 
+
+// some structures for handeling data
 typedef struct{
   float pressure1;
   float pressure2;

@@ -12,7 +12,6 @@ Flight_Sensors::Flight_Sensors(){
   this->bmp2 = Adafruit_BMP280(BMP2_CS);
   this->bno  = Adafruit_BNO055(BNO_ADR);
   //this->mma  = MMA6525(MMA_CS)
-  this->adc  = new ADC();
 
 }
 
@@ -30,6 +29,9 @@ bool Flight_Sensors::initialize(){
   pinMode(ISO_SENSE_21, INPUT);
   pinMode(ISO_SENSE_22, INPUT);
   pinMode(ISO_SENSE_23, INPUT);
+
+  pinMode(VSENSE, INPUT);
+  analogReadResolution(12);
 
   //code to initialize all sensors goes here
 
@@ -62,4 +64,10 @@ Bmp_Data* Flight_Sensors::readPressure(){
   //code to actaually read sensors goes here
 
   return bmp_data;
+}
+
+float Flight_Sensors::readVbat(){
+  int read = analogRead(VSENSE);
+  float vbat = ((float)read)/1023.0 * 3.3 / (VBAT_RATIO);
+  return vbat;
 }

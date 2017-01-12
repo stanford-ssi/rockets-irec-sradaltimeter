@@ -26,15 +26,16 @@ public:
   Flight_Data flight_data;
   Flight_Sensors flight_sensors;
   Flight_Events flight_events;
+
+
   /* mebmer variables */
-  uint16_t flight_state = STRTUP;
-  uint8_t led_counter = 0;
-  uint8_t buzzer_counter;
-  uint8_t buzzer_freq_scaler;
-  
+  uint16_t flight_state = STRTUP;   //flight state variable
+  uint8_t led_counter = 0;          //counter used to blink the led
+  uint8_t buzzer_counter;           //counter used to buzz the buzzer
+  uint8_t buzzer_freq_scaler;       //counter used to act as a scaler on the buzzer frequency
+
   void manageEvents();
   void startup();
-
 
 
 private:
@@ -44,6 +45,8 @@ private:
   void manageLEDs();
   void logData();
 
+  void buzzInidicate(bool buzz);
+  void buzzOff();
 
 };
 
