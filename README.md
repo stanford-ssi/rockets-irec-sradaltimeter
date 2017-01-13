@@ -5,7 +5,7 @@ Code to run on the embedded processor of the SSI SRAD altimeter.
 I'm sorry this readme doesn't have spellcheck so gg.
 
 ### Hardware overview
-For information on the hardware running on the 
+For information on the hardware that runs this software, refer to the the block diagram on slide 43 of this presentation: https://docs.google.com/presentation/d/14KYjnKT6mkemHLukVM1dhpyHSuQ0UrygPNCPN0DClOQ/edit#slide=id.g18c774c774_0_0
 
 ### Flight States
 The altimeter operates in discrete states that dictate the majority of the actions of the processor. However it is not in statemachine as the entirety of the unit is not determined solely by state and input.
