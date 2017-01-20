@@ -4,13 +4,13 @@ Code to run on the embedded processor of the SSI SRAD altimeter.
 
 I'm sorry this readme doesn't have spellcheck so gg.
 
-### Hardware overview
-For information on the hardware running on the 
+## Hardware overview
+For information on the hardware that runs this software, refer to the the block diagram on slide 43 of [this presentation] (https://docs.google.com/presentation/d/14KYjnKT6mkemHLukVM1dhpyHSuQ0UrygPNCPN0DClOQ/edit#slide=id.g18c774c774_0_0) 
 
-### Flight States
+## Flight States
 The altimeter operates in discrete states that dictate the majority of the actions of the processor. However it is not in statemachine as the entirety of the unit is not determined solely by state and input.
 
-#### States
+### States
 1. Pre-Launch  
  - 1a. Startup  
  - 1b. Idle
@@ -24,7 +24,7 @@ The altimeter operates in discrete states that dictate the majority of the actio
  - 3a. Awaiting Recovery
  - 3b. Recovered 
 
-#### Transitions 
+### Transitions 
 
 This details all of the flight transitions and what the criteria are for passing through. 
  - 1a => 1b: Transition occurs once startup is complete and all sensors initialized. Deterministic.
@@ -36,7 +36,7 @@ This details all of the flight transitions and what the criteria are for passing
  - 2d => 3a: Occurs after the altimeter sees a sharp acceleration spike, followed by minimal movement.
  
 
-### Events
+## Events
 
 The processor manages multiple tasks without the implementation of a full RTOS through the use of events that are triggered by interrupts.
 
@@ -44,9 +44,9 @@ Events are stored in the `uint8_t events` variable. Each bit of the `events` var
 
 The main event flags are triggered interrupt timers. These timers interrupt on constant intervals, and call a function that simply edits the interrupt bit in the `events` variable.
 
-### Code Organization
+## Code Organization
 
-#### Classes
+### Classes
 
 `Altimeter` - this is the primary class for the board and contains all of the other classes as members. Everything is initialized in this class
 
@@ -59,7 +59,7 @@ The main event flags are triggered interrupt timers. These timers interrupt on c
 
 `Altitude_Kalman_Filter` - Custom Kalman filter class for determining altitude. Stores all the relevant constants for the filter as well as the previous filter value. Contains all methods needed for filter update. 
 
-#### Members of `Altimeter` class
+### Members of `Altimeter` class
 
 flight_data: Object of type Flight_Data that stores all of the relevant data values for the flight. 
 flight_sensors: Object of type Flight_Sensors that interfaces with all sensors
@@ -69,25 +69,28 @@ flight_state: Integer that contains the enumerated flight state values
 *more to add below* 
 
 
-#### Non-Class Files
+### Non-Class Files
 
 `S-ALT_REV0.h` - header file for the board. Contains all pin definitions and any pcb layout specific values
 `Flight_Configurations.h` - header file that defines enumerated list and structures or various things within the project.
 
-### Implementation Details
+## Implementation Details
 
-#### SD Data storage
+### SD Data storage
 
 In the root directory of the SD card, a new folder should be generated to store files for each flight, numbered incrementally as `flight_[number]`. So, if the altimeter boots up and sees that the folders `\fight_1` and `\flight_2`, it should create a folder `flight_3` to log data in. 
 
-Within the folder for the flight, the altimeter should create a .csv file for each sensor source. So, it will contain `MMA.csv`, `BNO.csv`, `BMP.csv`, `esense.csv`, and `gps.csv` (and any others that I may have forgotten). Each line of each sensor file will be of the format: `[time stamp], [data field 1], [data field 2], ... `. Sensor readings are kept in separate files for better organization and to support writing sensor data at different frequencies (if it turn out that opening/closing files is time consuming, then things will be logged in a single file with an indicator for which sensor it was on each line).
+Within the folder for the flight, the altimeter shalll create a single `data.csv` file to log data into. It shall then write lines to the CSV file in the form: `[time stamp], [sensor enum], [data field 1], [data field 2], ... `. All possible sensor sources shall be enumerated as intergers makeing the `sensor enum` field, so that for each line it can be identified what the following datafeilds represent. Sensor readings are written in separate lines to support writing sensor data at different frequencies.
 
 For normal operations the altimeter should not log data to the SD card until after it reaches the `liftoff` state (to prevent excessive folder generation when the altimeter is simply just powered on). However, in the testing phase for data collection purposes, it should start logging data immediately. 
 
-#### RAM data storage
+### RAM data storage
 
 To keep a history of sensor information in the ram, each sensors should have circular array of variable length so store readings in. The storage should support the following functionality:
 - Changing the length of the array for each sensor
 - Store data at a fraction of the frequency it is sampled at (so if the accelerometer is sampled at 50Hz, it can be stored in ram at only say 10Hz, so that a longer history can be kept without taking up too much memory). However it should still be able to store at the same frequency that it is sampled if desired
 - methods for retrieving data given the sensor, and the nearest number of milliseconds/microseconds in the past it was logged.
 
+## Contact
+
+ - John Dean `<deanjl@stanford.edu>`
