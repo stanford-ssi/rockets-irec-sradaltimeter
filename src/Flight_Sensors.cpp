@@ -36,23 +36,23 @@ bool Flight_Sensors::initialize(){
   return sucessful;
 }
 
-bool* Flight_Sensors::readESense(){
-  bool* esense_array = new bool[4];
-  esense_array[0] = digitalReadFast(ESENSE_1);
-  esense_array[1] = digitalReadFast(ESENSE_2);
-  esense_array[2] = digitalReadFast(ESENSE_3);
-  esense_array[3] = digitalReadFast(ESENSE_4);
+byte Flight_Sensors::readESense(){
+  byte esense_array = 0;
+  if(digitalReadFast(ESENSE_1)){esense_array|(1<<7);}
+  if(digitalReadFast(ESENSE_2)){esense_array|(1<<6);}
+  if(digitalReadFast(ESENSE_3)){esense_array|(1<<5);}
+  if(digitalReadFast(ESENSE_4)){esense_array|(1<<4);}
   return esense_array;
 }
 
-bool* Flight_Sensors::readIsoSense(){
-  bool* iso_sense_array = new bool[6];
-  iso_sense_array[0] = digitalReadFast(ISO_SENSE_11);
-  iso_sense_array[1] = digitalReadFast(ISO_SENSE_12);
-  iso_sense_array[2] = digitalReadFast(ISO_SENSE_13);
-  iso_sense_array[3] = digitalReadFast(ISO_SENSE_21);
-  iso_sense_array[4] = digitalReadFast(ISO_SENSE_22);
-  iso_sense_array[5] = digitalReadFast(ISO_SENSE_23);
+byte Flight_Sensors::readIsoSense(){
+  byte iso_sense_array = 0;
+  if(digitalReadFast(ISO_SENSE_11)){iso_sense_array|(1<<7);}
+  if(digitalReadFast(ISO_SENSE_12)){iso_sense_array|(1<<6);}
+  if(digitalReadFast(ISO_SENSE_13)){iso_sense_array|(1<<5);}
+  if(digitalReadFast(ISO_SENSE_21)){iso_sense_array|(1<<4);}
+  if(digitalReadFast(ISO_SENSE_22)){iso_sense_array|(1<<3);}
+  if(digitalReadFast(ISO_SENSE_23)){iso_sense_array|(1<<2);}
   return iso_sense_array;
 }
 
@@ -65,7 +65,7 @@ Bmp_Data* Flight_Sensors::readPressure(){
 }
 
 float* Flight_Sensors::readAcceleration() {
-  
+
   float* ret = new float[2];
   sensors_event_t evt;
 

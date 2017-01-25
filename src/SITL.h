@@ -5,7 +5,7 @@
 #include "Flight_Configuration.h"
 #include "Salt_Rev0.h"
 
-#define FSTART       0x00
+#define FSTART       0xAA
 #define FESENSE      0x01
 #define FISOSENSE    0x02
 #define FBNO         0x03
@@ -16,16 +16,16 @@ class SITL{
 public:
 
   bool initialize();
-  bool* readESense();
-  bool* readIsoSense();
-  Bmp_Data* readPressure();
+  byte readESense();
+  byte readIsoSense();
+  Bmp_Data* readBMP();
   float readVbat();
 
 private:
   void float2Bytes(float val, byte* bytes_array);
-  float bytes2Float(byte* bytes_array);  
-  void updateTimeRequest();
-  byte request[5];
+  float bytes2Float(byte* bytes_array);
+  void request(byte select);
+  byte requestMsg[5];
   elapsedMillis global_time;
 
 };

@@ -22,8 +22,8 @@ public:
   Flight_Sensors();
   bool initialize();
 
-  bool* readESense();
-  bool* readIsoSense();
+  byte readESense();
+  byte readIsoSense();
   float* readAcceleration();
   //this function reads pressure data from the BMP280's and returns a pointer to the struct
   Bmp_Data* readPressure();

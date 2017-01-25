@@ -17,12 +17,12 @@ Date: 1-6-2017
 class Flight_Data {
 public:
 
-  bool* getESense();
-  bool* getIsoSense();
+  byte getESense();
+  byte getIsoSense();
 
-  void updateESense(bool* esense_array);
-  void updateIsoSense(bool* iso_sense_array);
-  void updatePressure(Bmp_Data* bmp_data);
+  void updateESense(byte esense_array);
+  void updateIsoSense(byte iso_sense_array);
+  void updateBMP(Bmp_Data* bmp_data);
 
 private:
   elapsedMillis global_time;
@@ -30,8 +30,8 @@ private:
   Bmp_Data bmp_data;
   Mma_Data mma_data;
   Bno_Data bno_data;
-  bool iso_sense_array[6];
-  bool esense_array[4];
+  byte iso_sense_array;
+  byte esense_array;
 
 };
 

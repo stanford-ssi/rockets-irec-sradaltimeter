@@ -16,7 +16,7 @@
 #include "Flight_Sensors.h"
 #include "Flight_Data.h"
 #include "Flight_Events.h"
-
+#include "SITL.h"
 #include "Flight_Configuration.h"
 
 
@@ -24,9 +24,9 @@ class Altimeter{
 public:
   /* member objects */
   Flight_Data flight_data;
-  Flight_Sensors flight_sensors;
+  //Flight_Sensors flight_sensors;
+  SITL sitl;
   Flight_Events flight_events;
-
 
   /* mebmer variables */
   uint16_t flight_state = STRTUP;   //flight state variable

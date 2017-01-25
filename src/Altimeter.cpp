@@ -11,7 +11,7 @@ void Altimeter::manageEvents(){
 
   }
   if(flight_events.check(EVENT_READ_BMP)){
-    flight_data.updatePressure(flight_sensors.readPressure());
+    flight_data.updateBMP(sitl.readBMP());
   }
 }
 
@@ -23,6 +23,8 @@ void Altimeter::startup(){
   pinMode(BUZZER, OUTPUT);
   analogWriteFrequency(BUZZER, BUZZ_TONE_MID);
   analogWrite(BUZZER, 128);
+  Serial.begin(9600);
+  delay(1000);
 	/* gpio */
 	pinMode(LED_1, OUTPUT);
 	pinMode(LED_2, OUTPUT);
@@ -33,9 +35,9 @@ void Altimeter::startup(){
 	pinMode(TRIG_2, OUTPUT);
 	pinMode(TRIG_3, OUTPUT);
 	pinMode(TRIG_4, OUTPUT);
-  Serial.begin(9600);
   SD.begin(SD_CS);
-	flight_sensors.initialize();
+	//flight_sensors.initialize();
+  sitl.initialize();
 	flight_events.initialize();
   delay(1000);
   analogWrite(BUZZER, 256);
@@ -51,7 +53,8 @@ void Altimeter::mainUpdate(){
     case IDLE:
       manageLEDs();
       manageBuzzer();
-      flight_data.updateESense(flight_sensors.readESense());
+      flight_data.updateBMP(sitl.readBMP());
+      //flight_data.updateESense(flight_sensors.readESense());
       break;
     case ARMED:
       break;
@@ -80,16 +83,16 @@ void Altimeter::manageBuzzer(){
   if(buzzer_freq_scaler == 0){
     switch(buzzer_counter){
       case 0:
-        buzzInidicate(flight_data.getESense()[0]);
+        buzzInidicate(flight_data.getESense()&(1<<7));
         break;
       case 2:
-        buzzInidicate(flight_data.getESense()[1]);
+        buzzInidicate(flight_data.getESense()&(1<<6));
         break;
       case 4:
-        buzzInidicate(flight_data.getESense()[2]);
+        buzzInidicate(flight_data.getESense()&(1<<5));
         break;
       case 6:
-        buzzInidicate(flight_data.getESense()[3]);
+        buzzInidicate(flight_data.getESense()&(1<<4));
         break;
         default:
           buzzOff();
