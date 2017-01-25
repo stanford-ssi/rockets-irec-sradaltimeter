@@ -7,13 +7,11 @@ Date: 1-6-2017
 
 
 /*Sensors*/
-Flight_Sensors::Flight_Sensors(){
-  this->bmp1 = Adafruit_BMP280(BMP1_CS);
-  this->bmp2 = Adafruit_BMP280(BMP2_CS);
-  this->bno  = Adafruit_BNO055(BNO_ADR);
-  //this->mma  = MMA6525(MMA_CS)
-
-}
+Flight_Sensors::Flight_Sensors()
+  : bmp1(Adafruit_BMP280(BMP1_CS)),
+    bmp2(Adafruit_BMP280(BMP2_CS)),
+    bno(Adafruit_BNO055(BNO_ADR)),
+    mma(MMA65XX_Sensor(MMA_CS)){}
 
 bool Flight_Sensors::initialize(){
   bool sucessful = true;
@@ -64,6 +62,18 @@ Bmp_Data* Flight_Sensors::readPressure(){
   //code to actaually read sensors goes here
 
   return bmp_data;
+}
+
+float* Flight_Sensors::readAcceleration() {
+  
+  float* ret = new float[2];
+  sensors_event_t evt;
+
+  mma.getEvent(&evt);
+  ret[0] = evt.acceleration.x;
+  ret[1] = evt.acceleration.y;
+
+  return ret;
 }
 
 float Flight_Sensors::readVbat(){

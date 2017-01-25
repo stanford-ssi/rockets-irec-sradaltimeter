@@ -13,6 +13,7 @@ Date: 1-6-2017
 #include <Adafruit_BNO055.h>
 #include <Adafruit_BMP280.h>
 #include <ADC.h>
+#include <MMA65XX_Sensor.h>
 #include "Salt_Rev0.h"
 #include "Flight_Configuration.h"
 
@@ -21,9 +22,10 @@ public:
   Flight_Sensors();
   bool initialize();
 
-  //this function reads pressure data from the BMP280's and retruns a pointer to the struct
   bool* readESense();
   bool* readIsoSense();
+  float* readAcceleration();
+  //this function reads pressure data from the BMP280's and returns a pointer to the struct
   Bmp_Data* readPressure();
   float readVbat();
 
@@ -31,6 +33,7 @@ private:
   Adafruit_BMP280 bmp1;
   Adafruit_BMP280 bmp2;
   Adafruit_BNO055 bno;
+  MMA65XX_Sensor mma;
 };
 
 
