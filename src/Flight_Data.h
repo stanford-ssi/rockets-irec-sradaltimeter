@@ -25,8 +25,8 @@ public:
   void updatePressure(Bmp_Data* bmp_data);
 
 private:
-  uint32_t time;
-  uint32_t liftoff_time;
+  elapsedMillis global_time;
+  elapsedMillis flight_time;
   Bmp_Data bmp_data;
   Mma_Data mma_data;
   Bno_Data bno_data;
