@@ -11,7 +11,7 @@ void Altimeter::manageEvents(){
 
   }
   if(flight_events.check(EVENT_READ_BMP)){
-    flight_data.updateBMP(sitl.readBMP());
+    //flight_data.updateBMP(sitl.readBMP());
   }
 }
 
@@ -36,8 +36,13 @@ void Altimeter::startup(){
 	pinMode(TRIG_3, OUTPUT);
 	pinMode(TRIG_4, OUTPUT);
   SD.begin(SD_CS);
-	//flight_sensors.initialize();
+
+  #ifdef SITL
   sitl.initialize();
+  #else
+	flight_sensors.initialize();
+  #endif
+
 	flight_events.initialize();
   delay(1000);
   analogWrite(BUZZER, 256);
@@ -53,7 +58,9 @@ void Altimeter::mainUpdate(){
     case IDLE:
       manageLEDs();
       manageBuzzer();
-      flight_data.updateBMP(sitl.readBMP());
+      flight_data.writeBuffers();
+      flight_data.printBuffers();
+      //flight_data.updateBMP(sitl.readBMP());
       //flight_data.updateESense(flight_sensors.readESense());
       break;
     case ARMED:

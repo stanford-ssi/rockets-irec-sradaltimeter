@@ -14,6 +14,20 @@ Date: 1-6-2017
 #include "Salt_Rev0.h"
 #include "Flight_Configuration.h"
 
+#define ARRAYLENGTH 100
+
+template <class t_type> class Circular_Buffer{
+public:
+  void push(t_type data);
+  t_type getLast();
+  t_type* getFullArray();
+
+private:
+  void checkHead();
+  t_type data_array[ARRAYLENGTH];
+  int head = 0;
+};
+
 class Flight_Data {
 public:
 
@@ -23,6 +37,8 @@ public:
   void updateESense(byte esense_array);
   void updateIsoSense(byte iso_sense_array);
   void updateBMP(Bmp_Data* bmp_data);
+  void writeBuffers();
+  void printBuffers();
 
 private:
   elapsedMillis global_time;
@@ -32,7 +48,10 @@ private:
   Bno_Data bno_data;
   byte iso_sense_array;
   byte esense_array;
+  Circular_Buffer<int> test_buffer;
 
 };
+
+
 
 #endif

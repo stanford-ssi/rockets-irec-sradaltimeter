@@ -8,6 +8,9 @@ Date: 1-6-2017
 #ifndef FLIGHT_CONFIGURATION_H
 #define FLIGHT_CONFIGURATION_H
 
+//#define SITL    //togle this to turn on SITL testing
+
+
 #define UPDATE_FREQ_HZ      30       //frequency of the main update
 #define BEEP_FREQ_HZ        4        //frequency that the buzzer will beep at
 
