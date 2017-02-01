@@ -35,7 +35,7 @@ void Altimeter::startup(){
 	pinMode(TRIG_2, OUTPUT);
 	pinMode(TRIG_3, OUTPUT);
 	pinMode(TRIG_4, OUTPUT);
-  SD.begin(SD_CS);
+  flight_data.initialize();
 
   #ifdef SITL
   sitl.initialize();

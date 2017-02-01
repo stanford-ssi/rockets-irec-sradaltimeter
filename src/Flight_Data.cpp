@@ -6,6 +6,9 @@ Date: 1-6-2017
 
 #include "Flight_Data.h"
 
+void Flight_Data::initialize(){
+  SD.begin(SD_CS);
+}
 void Flight_Data::updateESense(byte esense_array){
   this->esense_array = esense_array;
 }
@@ -66,7 +69,6 @@ template<class t_type> t_type* Circular_Buffer<t_type>::getFullArray(){
   }
   return full_array;
 }
-
 
 template<class t_type> void Circular_Buffer<t_type>::checkHead(){
   if(head >= ARRAYLENGTH){

@@ -11,6 +11,7 @@ Date: 1-6-2017
 #define FLIGHT_DATA_H
 
 #include <WProgram.h>
+#include <SD.h>
 #include "Salt_Rev0.h"
 #include "Flight_Configuration.h"
 
@@ -33,7 +34,7 @@ public:
 
   byte getESense();
   byte getIsoSense();
-
+  void initialize();
   void updateESense(byte esense_array);
   void updateIsoSense(byte iso_sense_array);
   void updateBMP(Bmp_Data* bmp_data);
