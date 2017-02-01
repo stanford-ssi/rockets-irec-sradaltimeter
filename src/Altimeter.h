@@ -28,7 +28,7 @@ public:
   //SITL sitl;
   Flight_Events flight_events;
 
-  /* mebmer variables */
+  /* member variables */
   uint16_t flight_state = STRTUP;   //flight state variable
   uint8_t led_counter = 0;          //counter used to blink the led
   uint8_t buzzer_counter;           //counter used to buzz the buzzer

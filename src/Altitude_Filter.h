@@ -7,7 +7,7 @@ This file defines the class for the altitude kalman filter. Not implemented yet.
 
 #include <WProgram.h>
 #include <Eigen30.h>
-#include <Eigen\Dense>
+#include <Eigen/Dense>
 #include "Flight_Configuration.h"
 
 //configuration options
