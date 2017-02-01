@@ -24,8 +24,8 @@ class Altimeter{
 public:
   /* member objects */
   Flight_Data flight_data;
-  //Flight_Sensors flight_sensors;
-  SITL sitl;
+  Flight_Sensors flight_sensors;
+  //SITL sitl;
   Flight_Events flight_events;
 
   /* member variables */
