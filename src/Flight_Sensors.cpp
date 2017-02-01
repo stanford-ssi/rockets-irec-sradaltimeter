@@ -31,47 +31,48 @@ bool Flight_Sensors::initialize(){
   pinMode(VSENSE, INPUT);
   analogReadResolution(12);
 
-  //code to initialize all sensors goes here
-
+  sucessful &= bmp1.begin();
+  sucessful &= bmp2.begin();
+  sucessful &= mma.begin();
+  
   return sucessful;
 }
 
 byte Flight_Sensors::readESense(){
   byte esense_array = 0;
-  if(digitalReadFast(ESENSE_1)){esense_array|(1<<7);}
-  if(digitalReadFast(ESENSE_2)){esense_array|(1<<6);}
-  if(digitalReadFast(ESENSE_3)){esense_array|(1<<5);}
-  if(digitalReadFast(ESENSE_4)){esense_array|(1<<4);}
+  if(digitalReadFast(ESENSE_1)){esense_array|=(1<<7);}
+  if(digitalReadFast(ESENSE_2)){esense_array|=(1<<6);}
+  if(digitalReadFast(ESENSE_3)){esense_array|=(1<<5);}
+  if(digitalReadFast(ESENSE_4)){esense_array|=(1<<4);}
   return esense_array;
 }
 
 byte Flight_Sensors::readIsoSense(){
   byte iso_sense_array = 0;
-  if(digitalReadFast(ISO_SENSE_11)){iso_sense_array|(1<<7);}
-  if(digitalReadFast(ISO_SENSE_12)){iso_sense_array|(1<<6);}
-  if(digitalReadFast(ISO_SENSE_13)){iso_sense_array|(1<<5);}
-  if(digitalReadFast(ISO_SENSE_21)){iso_sense_array|(1<<4);}
-  if(digitalReadFast(ISO_SENSE_22)){iso_sense_array|(1<<3);}
-  if(digitalReadFast(ISO_SENSE_23)){iso_sense_array|(1<<2);}
+  if(digitalReadFast(ISO_SENSE_11)){iso_sense_array|=(1<<7);}
+  if(digitalReadFast(ISO_SENSE_12)){iso_sense_array|=(1<<6);}
+  if(digitalReadFast(ISO_SENSE_13)){iso_sense_array|=(1<<5);}
+  if(digitalReadFast(ISO_SENSE_21)){iso_sense_array|=(1<<4);}
+  if(digitalReadFast(ISO_SENSE_22)){iso_sense_array|=(1<<3);}
+  if(digitalReadFast(ISO_SENSE_23)){iso_sense_array|=(1<<2);}
   return iso_sense_array;
 }
 
 Bmp_Data* Flight_Sensors::readPressure(){
   Bmp_Data* bmp_data = new Bmp_Data;
-
-  //code to actaually read sensors goes here
-
+  bmp_data->pressure1 = bmp1.readPressure();
+  bmp_data->pressure2 = bmp2.readPressure();
   return bmp_data;
 }
 
-float* Flight_Sensors::readAcceleration() {
+Mma_Data* Flight_Sensors::readAcceleration() {
 
-  float* ret = new float[2];
+  Mma_Data* ret = new Mma_Data;
   sensors_event_t evt;
 
   mma.getEvent(&evt);
-  ret[0] = evt.acceleration.x;
-  ret[1] = evt.acceleration.y;
+  ret->x = evt.acceleration.x;
+  ret->y = evt.acceleration.y;
 
   return ret;
 }

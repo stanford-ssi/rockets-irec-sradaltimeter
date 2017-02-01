@@ -24,7 +24,7 @@ public:
 
   byte readESense();
   byte readIsoSense();
-  float* readAcceleration();
+  Mma_Data* readAcceleration();
   //this function reads pressure data from the BMP280's and returns a pointer to the struct
   Bmp_Data* readPressure();
   float readVbat();
