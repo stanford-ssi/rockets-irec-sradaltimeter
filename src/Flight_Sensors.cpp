@@ -34,7 +34,7 @@ bool Flight_Sensors::initialize(){
   sucessful &= bmp1.begin();
   sucessful &= bmp2.begin();
   sucessful &= mma.begin();
-  
+
   return sucessful;
 }
 

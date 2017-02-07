@@ -10,17 +10,22 @@ Date: 1-6-2017
 
 //#define SITL    //togle this to turn on SITL testing
 
-
 #define UPDATE_FREQ_HZ      30       //frequency of the main update
 #define BEEP_FREQ_HZ        4        //frequency that the buzzer will beep at
+
+/*ettings for indicating sensors*/
+#define FSTART       0xAA
+#define FESENSE      0x01
+#define FISOSENSE    0x02
+#define FBNO         0x03
+#define FMMA         0x04
+#define FBMP         0x05
 
 
 /*tone settings for the buzzer */
 #define BUZZ_TONE_HIGH      5000
 #define BUZZ_TONE_MID       4000
 #define BUZZ_TONE_LOW       3000
-
-
 
 //enumeration of flight states
 enum {

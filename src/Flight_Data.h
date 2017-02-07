@@ -11,11 +11,13 @@ Date: 1-6-2017
 #define FLIGHT_DATA_H
 
 #include <WProgram.h>
-#include <SD.h>
+#include <SDfat.h>
 #include "Salt_Rev0.h"
 #include "Flight_Configuration.h"
 
 #define ARRAYLENGTH 100
+#define BLOCK_COUNT 256000
+
 
 template <class t_type> class Circular_Buffer{
 public:
@@ -31,15 +33,19 @@ private:
 
 class Flight_Data {
 public:
-
+  bool initialize();
   byte getESense();
   byte getIsoSense();
-  void initialize();
   void updateESense(byte esense_array);
   void updateIsoSense(byte iso_sense_array);
   void updateBMP(Bmp_Data* bmp_data);
   void writeBuffers();
   void printBuffers();
+
+  /* ----- SD Card ----- */
+  void dataLog(byte sensor);
+  File newDataFile(File dir);
+  void printDirectory(File dir, int numTabs);
 
 private:
   elapsedMillis global_time;
@@ -50,6 +56,13 @@ private:
   byte iso_sense_array;
   byte esense_array;
   Circular_Buffer<int> test_buffer;
+
+  /* ----- SD Card ----- */
+  SdFat sd;
+  SdFile data_file;
+  uint32_t bgnBlock, endBlock;
+
+  int iii = 0;
 
 };
 

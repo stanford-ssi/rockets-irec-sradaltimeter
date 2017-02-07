@@ -5,12 +5,7 @@
 #include "Flight_Configuration.h"
 #include "Salt_Rev0.h"
 
-#define FSTART       0xAA
-#define FESENSE      0x01
-#define FISOSENSE    0x02
-#define FBNO         0x03
-#define FMMA         0x04
-#define FBMP         0x05
+
 
 class SITL{
 public:

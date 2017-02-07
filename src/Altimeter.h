@@ -8,7 +8,6 @@
 #include <WProgram.h>
 #include <stdint.h>
 #include <SPI.h>
-#include <SD.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 #include <Adafruit_BMP280.h>

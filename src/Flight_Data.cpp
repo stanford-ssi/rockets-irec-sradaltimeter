@@ -6,11 +6,47 @@ Date: 1-6-2017
 
 #include "Flight_Data.h"
 
-void Flight_Data::initialize(){
-  SD.begin(SD_CS);
+bool Flight_Data::initialize(){
+  bool success = true;
+  global_time = 0;
+  success &= sd.begin(SD_CS, SPI_FULL_SPEED);
+  sd.ls(LS_SIZE|LS_R);
+  sd.mkdir("Flights");
+  sd.chdir("Flights");
+  String filepath;
+  filepath += "F000.csv";
+  while (sd.exists(filepath.c_str())) {
+    if (filepath[3] != '9') {
+      filepath[3]++;
+    } else if (filepath[2] != '9'){
+      filepath[2]++;
+      filepath[3] = '0';
+    } else if (filepath[1] != '9'){
+      filepath[1]++;
+      filepath[2] = 0;
+      filepath[3] = 0;
+    }
+  }
+  Serial.print("Creating new data file, ");
+  Serial.println(filepath);
+  // success &= data_file.contigu
+  // success &= data_file.open(filepath.c_str(),O_RDWR | O_CREAT | O_AT_END);
+  // data_file.println("lets try and write some shit");
+  // for(int i = 0; i < 1000; i++){
+  //   elapsedMicros timer = 0;
+  //   data_file.print(global_time);
+  //   data_file.print(",");
+  //   data_file.print("DAAAAAATTTTTTTAAAAAAAAATTTTTAAAAAA");
+  //   data_file.sync();
+  //   Serial.println(timer);
+  //   delay(10);
+  // }
+
+  return success;
 }
 void Flight_Data::updateESense(byte esense_array){
   this->esense_array = esense_array;
+  //dataLog(FESENSE);
 }
 
 void Flight_Data::updateIsoSense(byte iso_sense_array){
@@ -43,10 +79,83 @@ void Flight_Data::printBuffers(){
     Serial.print(',');
   }
   Serial.println(' ');
-  //delete buffer;
+  delete buffer;
 }
 
-//-----Circular_Storage_Buffer
+/* ------ SD card ------ */
+
+void Flight_Data::dataLog(byte sensor){
+  elapsedMicros timer2;
+  iii++;
+  switch(sensor){
+    case FESENSE:
+
+      data_file.print(FESENSE + ',');
+      data_file.print(global_time + ',');
+      data_file.println(esense_array);
+      if(iii == 300) data_file.flush();
+      Serial.println(timer2);
+
+
+    break;
+    case FISOSENSE:
+
+
+    break;
+  }
+}
+
+void Flight_Data::printDirectory(File dir, int numTabs) {
+  while (true) {
+    File entry =  dir.openNextFile();
+    if (! entry) {
+      // no more files
+      break;
+    }
+    for (uint8_t i = 0; i < numTabs; i++) {
+      Serial.print('\t');
+    }
+    Serial.print(entry.name());
+    if (entry.isDirectory()) {
+      Serial.println("/");
+      printDirectory(entry, numTabs + 1);
+    } else {
+      // files have sizes, directories do not
+      Serial.print("\t\t");
+      Serial.println(entry.size(), DEC);
+    }
+    entry.close();
+  }
+}
+
+File Flight_Data::newDataFile(File dir){
+  int n = 0;
+  while(true){
+    n++;
+    File entry = dir.openNextFile();
+    if(! entry){
+      // no more files
+      String filepath;
+      filepath += dir.name();
+      filepath += "/f";
+      if(n<10) filepath += "00";      //pad with 0's
+      else if(n<100) filepath += "0";
+      filepath += n;
+      filepath += ".csv";
+      File newfile = sd.open(filepath.c_str(),FILE_WRITE);
+      if (newfile){
+        Serial.print("success  ");
+      } else {
+        Serial.print("fail  ");
+      }
+      //Serial.println(filepath);
+      return newfile;
+    }
+    entry.close();
+  }
+}
+
+/* ----- Circular_Storage_Buffer ------ */
 
 
 template<class t_type> void Circular_Buffer<t_type>::push(t_type data){

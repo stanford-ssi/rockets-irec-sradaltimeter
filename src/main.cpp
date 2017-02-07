@@ -2,6 +2,7 @@
 
 /* global object */
 Altimeter  altimeter;
+ArduinoOutStream cout(Serial);
 
 int main(void)
 {

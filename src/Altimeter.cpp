@@ -21,8 +21,8 @@ and initializes everything.
 */
 void Altimeter::startup(){
   pinMode(BUZZER, OUTPUT);
-  //analogWriteFrequency(BUZZER, BUZZ_TONE_MID);
-  //analogWrite(BUZZER, 128);
+  analogWriteFrequency(BUZZER, BUZZ_TONE_MID);
+  analogWrite(BUZZER, 256);
   Serial.begin(9600);
   delay(1000);
 	/* gpio */
@@ -37,14 +37,14 @@ void Altimeter::startup(){
 	pinMode(TRIG_4, OUTPUT);
   flight_data.initialize();
   #ifdef SITL
-        sitl.initialize();
+    sitl.initialize();
   #else
-	flight_sensors.initialize();
+	  flight_sensors.initialize();
   #endif
 
 	flight_events.initialize();
   delay(1000);
-  //analogWrite(BUZZER, 256);
+  analogWrite(BUZZER, 256);
   flight_state = IDLE;
 }
 
@@ -56,11 +56,10 @@ void Altimeter::mainUpdate(){
   switch(flight_state){
     case IDLE:
       manageLEDs();
-      manageBuzzer();
+      //manageBuzzer();
       flight_data.writeBuffers();
-      flight_data.printBuffers();
       //flight_data.updateBMP(sitl.readBMP());
-      //flight_data.updateESense(flight_sensors.readESense());
+      flight_data.updateESense(flight_sensors.readESense());
       break;
     case ARMED:
       break;
