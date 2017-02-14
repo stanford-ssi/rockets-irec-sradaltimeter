@@ -15,24 +15,49 @@ Date: 1-6-2017
 #include "Salt_Rev0.h"
 #include "Flight_Configuration.h"
 
-#define ARRAYLENGTH 100
+uint16_t D_ARRAY_LENGTH  = 100;
+uint16_t D_STORE_FREQ    = 1;
+uint16_t D_SAMPLE_FREQ   = 30;
+
 #define BLOCK_COUNT 256000
 
-
-template <class t_type> class Circular_Buffer{
+/*
+This class is a curicular storage buffer used for storing both the most recent recorded
+data value, and a history. It can take any type. It must be initialized with:
+1. the frequency that the data is sampled at
+2. the frequency that the data will be stored at
+3. the length of the array
+*/
+template <class t_type> class Circular_Array{
 public:
+  Circular_Array(uint16_t sample_freq, uint16_t store_freq, uint16_t array_length);
+  ~Circular_Array();
   void push(t_type data);
   t_type getLast();
   t_type* getFullArray();
+  t_type getOld(uint32_t get_time);
 
 private:
+  uint16_t sample_freq;
+  uint16_t store_freq;
+  uint16_t store_prescale;
+  uint16_t array_length;
+  uint16_t log_count;
+  uint16_t head;
+  uint16_t write_count;
   void checkHead();
-  t_type data_array[ARRAYLENGTH];
-  int head = 0;
+  t_type* data_array;
 };
 
 class Flight_Data {
 public:
+  Flight_Data() :
+    bmp_buf(D_SAMPLE_FREQ, D_STORE_FREQ, D_ARRAY_LENGTH),
+    mma_buf(D_SAMPLE_FREQ, D_STORE_FREQ, D_ARRAY_LENGTH),
+    bno_buf(D_SAMPLE_FREQ, D_STORE_FREQ, D_ARRAY_LENGTH),
+    esense_buf(D_SAMPLE_FREQ, D_STORE_FREQ, D_ARRAY_LENGTH),
+    isosense_buf(D_SAMPLE_FREQ, D_STORE_FREQ, D_ARRAY_LENGTH) {}
+
   bool initialize();
   byte getESense();
   byte getIsoSense();
@@ -55,14 +80,18 @@ private:
   Bno_Data bno_data;
   byte iso_sense_array;
   byte esense_array;
-  Circular_Buffer<int> test_buffer;
+  Circular_Array<Bmp_Data> bmp_buf;
+  Circular_Array<Mma_Data> mma_buf;
+  Circular_Array<Bno_Data> bno_buf;
+  Circular_Array<byte> esense_buf;
+  Circular_Array<byte> isosense_buf;
 
   /* ----- SD Card ----- */
   SdFat sd;
   SdFile data_file;
   uint32_t bgnBlock, endBlock;
 
-  int iii = 0;
+
 
 };
 

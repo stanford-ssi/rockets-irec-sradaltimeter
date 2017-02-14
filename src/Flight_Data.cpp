@@ -68,42 +68,23 @@ void Flight_Data::updateBMP(Bmp_Data* bmp_data){
 }
 
 void Flight_Data::writeBuffers(){
-  int i = millis();
-  test_buffer.push(i);
+  // int i = millis();
+  // test_buffer.push(i);
 }
 
 void Flight_Data::printBuffers(){
-  int* buffer = test_buffer.getFullArray();
-  for(int i = 0; i < ARRAYLENGTH; i++){
-    Serial.print(buffer[i]);
-    Serial.print(',');
-  }
-  Serial.println(' ');
-  delete buffer;
+  // int* buffer = test_buffer.getFullArray();
+  // for(int i = 0; i < ARRAYLENGTH; i++){
+  //   Serial.print(buffer[i]);
+  //   Serial.print(',');
+  // }
+  // Serial.println(' ');
+  // delete buffer;
 }
 
 /* ------ SD card ------ */
 
-void Flight_Data::dataLog(byte sensor){
-  elapsedMicros timer2;
-  iii++;
-  switch(sensor){
-    case FESENSE:
 
-      data_file.print(FESENSE + ',');
-      data_file.print(global_time + ',');
-      data_file.println(esense_array);
-      if(iii == 300) data_file.flush();
-      Serial.println(timer2);
-
-
-    break;
-    case FISOSENSE:
-
-
-    break;
-  }
-}
 
 void Flight_Data::printDirectory(File dir, int numTabs) {
   while (true) {
@@ -157,30 +138,54 @@ File Flight_Data::newDataFile(File dir){
 
 /* ----- Circular_Storage_Buffer ------ */
 
+template<class t_type> Circular_Array<t_type>::Circular_Array(uint16_t sample_freq, uint16_t store_freq, uint16_t array_length){
+    this->sample_freq = sample_freq;
+    this->store_freq = store_freq;
+    this->array_length = array_length;
+    this->store_prescale = sample_freq/store_freq;
+    data_array = new t_type[array_length];
+    head = 0;
+    write_count = 0;
+}
 
-template<class t_type> void Circular_Buffer<t_type>::push(t_type data){
-  head++;
-  checkHead();
+template<class t_type> Circular_Array<t_type>::~Circular_Array(){
+  delete [] data_array;
+}
+
+template<class t_type> t_type Circular_Array<t_type>::getOld(uint32_t get_time){
+   int16_t ind = static_cast<float>(sample_freq) * get_time / store_prescale / 1000;
+   ind = head - ind;
+   if(ind < 0) ind += array_length;
+   return data_array[ind];
+}
+
+template<class t_type> void Circular_Array<t_type>::push(t_type data){
+  write_count++;
+  if(write_count >= store_prescale){
+    write_count = 0;
+    head++;
+    checkHead();
+  }
   data_array[head] = data;
 }
 
-template<class t_type> t_type Circular_Buffer<t_type>::getLast(){
+template<class t_type> t_type Circular_Array<t_type>::getLast(){
   return data_array[head];
 }
 
-template<class t_type> t_type* Circular_Buffer<t_type>::getFullArray(){
-  t_type* full_array = new t_type[ARRAYLENGTH];
+template<class t_type> t_type* Circular_Array<t_type>::getFullArray(){
+  t_type* full_array = new t_type[array_length];
   for(int i = 0; i <= head; i++){
     full_array[i] = data_array[head-i];
   }
-  for(int i = head+1; i < ARRAYLENGTH; i++){
-    full_array[i] = data_array[(ARRAYLENGTH+head)-i];
+  for(int i = head+1; i < array_length; i++){
+    full_array[i] = data_array[(array_length+head)-i];
   }
   return full_array;
 }
 
-template<class t_type> void Circular_Buffer<t_type>::checkHead(){
-  if(head >= ARRAYLENGTH){
+template<class t_type> void Circular_Array<t_type>::checkHead(){
+  if(head >= array_length){
     head = 0;
   }
 }

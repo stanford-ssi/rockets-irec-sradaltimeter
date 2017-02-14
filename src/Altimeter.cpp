@@ -62,6 +62,19 @@ void Altimeter::mainUpdate(){
       flight_data.updateESense(flight_sensors.readESense());
       break;
     case ARMED:
+      manageLEDs();
+      break;
+    case PWRD_FLGHT:
+      break;
+    case COAST:
+      break;
+    case DESCNT_DROG:
+      break;
+    case DESCNT_MAIN:
+      break;
+    case PRE_RCVRY:
+      break;
+    case RCVRED:
       break;
     }
 }
