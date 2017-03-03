@@ -1,8 +1,8 @@
 /*
-This class deals with interfacing with all sensors.
+  This class deals with interfacing with all sensors.
 
-Author: John Dean
-Date: 1-6-2017
+  Author: John Dean
+  Date: 1-6-2017
 */
 #ifndef FLIGHT_SENSORS_H
 #define FLIGHT_SENSORS_H
@@ -16,24 +16,28 @@ Date: 1-6-2017
 #include <MMA65XX_Sensor.h>
 #include "Salt_Rev0.h"
 #include "Flight_Configuration.h"
+#include "Gps_Sensor.h"
 
 class Flight_Sensors {
-public:
+ public:
   Flight_Sensors();
   bool initialize();
+  void update();
 
   byte readESense();
   byte readIsoSense();
   Mma_Data* readAcceleration();
   //this function reads pressure data from the BMP280's and returns a pointer to the struct
   Bmp_Data* readPressure();
+  Gps_Data* readPosition();
   float readVbat();
 
-private:
+ private:
   Adafruit_BMP280 bmp1;
   Adafruit_BMP280 bmp2;
   Adafruit_BNO055 bno;
   MMA65XX_Sensor mma;
+  Gps_Sensor gps;
 };
 
 
