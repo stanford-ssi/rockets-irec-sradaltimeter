@@ -36,7 +36,7 @@ bool Flight_Sensors::initialize(){
   sucessful &= bmp2.begin();
   sucessful &= mma.begin();
   sucessful &= gps.begin();
-  
+
   return sucessful;
 }
 

@@ -80,7 +80,6 @@ void Altimeter::startup(){
   logger.init_variable(LOG_MMA, "mma", sizeof(Mma_Data));
   logger.init_variable(LOG_BNO, "bno", sizeof(Bno_Data));
   logger.init_variable(LOG_EVENT, "event", sizeof(Event_Data));
-
   logger.finish_headers();
 }
 
