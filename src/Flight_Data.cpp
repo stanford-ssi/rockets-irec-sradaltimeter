@@ -6,9 +6,13 @@ Date: 1-6-2017
 
 #include "Flight_Data.h"
 
+ /*Flight_Data::Flight_Data() {
+
+ }*/
+
 bool Flight_Data::initialize(){
   bool success = true;
-  global_time = 0;
+  /*global_time = 0;
   success &= sd.begin(SD_CS, SPI_FULL_SPEED);
   sd.ls(LS_SIZE|LS_R);
   sd.mkdir("Flights");
@@ -28,7 +32,7 @@ bool Flight_Data::initialize(){
     }
   }
   Serial.print("Creating new data file, ");
-  Serial.println(filepath);
+  Serial.println(filepath);*/
   // success &= data_file.contigu
   // success &= data_file.open(filepath.c_str(),O_RDWR | O_CREAT | O_AT_END);
   // data_file.println("lets try and write some shit");
@@ -137,20 +141,6 @@ File Flight_Data::newDataFile(File dir){
 }
 
 /* ----- Circular_Storage_Buffer ------ */
-
-template<class t_type> Circular_Array<t_type>::Circular_Array(uint16_t sample_freq, uint16_t store_freq, uint16_t array_length){
-    this->sample_freq = sample_freq;
-    this->store_freq = store_freq;
-    this->array_length = array_length;
-    this->store_prescale = sample_freq/store_freq;
-    data_array = new t_type[array_length];
-    head = 0;
-    write_count = 0;
-}
-
-template<class t_type> Circular_Array<t_type>::~Circular_Array(){
-  delete [] data_array;
-}
 
 template<class t_type> t_type Circular_Array<t_type>::getOld(uint32_t get_time){
    int16_t ind = static_cast<float>(sample_freq) * get_time / store_prescale / 1000;

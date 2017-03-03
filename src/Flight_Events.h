@@ -25,10 +25,14 @@ public:
   that is is possible to pass the pointer to them to the interrupt
   timer object */
   static void eventMain(void);
+  static void eventAltimeter(void);
+  static void eventAccel(void);
 
 
 private:
   IntervalTimer main_loop_timer;
+  IntervalTimer altimeter_timer;
+  IntervalTimer accel_timer;
 };
 
 #endif

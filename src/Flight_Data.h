@@ -11,13 +11,13 @@ Date: 1-6-2017
 #define FLIGHT_DATA_H
 
 #include <WProgram.h>
-#include <SDfat.h>
+#include <SdFat.h>
 #include "Salt_Rev0.h"
 #include "Flight_Configuration.h"
 
-uint16_t D_ARRAY_LENGTH  = 100;
-uint16_t D_STORE_FREQ    = 1;
-uint16_t D_SAMPLE_FREQ   = 30;
+const uint16_t D_ARRAY_LENGTH  = 100;
+const uint16_t D_STORE_FREQ    = 1;
+const uint16_t D_SAMPLE_FREQ   = 30;
 
 #define BLOCK_COUNT 256000
 
@@ -30,8 +30,19 @@ data value, and a history. It can take any type. It must be initialized with:
 */
 template <class t_type> class Circular_Array{
 public:
-  Circular_Array(uint16_t sample_freq, uint16_t store_freq, uint16_t array_length);
-  ~Circular_Array();
+  Circular_Array(uint16_t sample_freq, uint16_t store_freq, uint16_t array_length)
+  {
+    this->sample_freq = sample_freq;
+    this->store_freq = store_freq;
+    this->array_length = array_length;
+    this->store_prescale = sample_freq/store_freq;
+    data_array = new t_type[array_length];
+    head = 0;
+    write_count = 0;
+  };
+  ~Circular_Array() {
+    delete [] data_array;
+  };
   void push(t_type data);
   t_type getLast();
   t_type* getFullArray();
@@ -56,7 +67,7 @@ public:
     mma_buf(D_SAMPLE_FREQ, D_STORE_FREQ, D_ARRAY_LENGTH),
     bno_buf(D_SAMPLE_FREQ, D_STORE_FREQ, D_ARRAY_LENGTH),
     esense_buf(D_SAMPLE_FREQ, D_STORE_FREQ, D_ARRAY_LENGTH),
-    isosense_buf(D_SAMPLE_FREQ, D_STORE_FREQ, D_ARRAY_LENGTH) {}
+    isosense_buf(D_SAMPLE_FREQ, D_STORE_FREQ, D_ARRAY_LENGTH) {};
 
   bool initialize();
   byte getESense();
@@ -80,17 +91,17 @@ private:
   Bno_Data bno_data;
   byte iso_sense_array;
   byte esense_array;
-  Circular_Array<Bmp_Data> bmp_buf;
-  Circular_Array<Mma_Data> mma_buf;
-  Circular_Array<Bno_Data> bno_buf;
-  Circular_Array<byte> esense_buf;
-  Circular_Array<byte> isosense_buf;
 
   /* ----- SD Card ----- */
   SdFat sd;
   SdFile data_file;
   uint32_t bgnBlock, endBlock;
 
+  Circular_Array<Bmp_Data> bmp_buf;
+  Circular_Array<Mma_Data> mma_buf;
+  Circular_Array<Bno_Data> bno_buf;
+  Circular_Array<byte> esense_buf;
+  Circular_Array<byte> isosense_buf;
 
 
 };

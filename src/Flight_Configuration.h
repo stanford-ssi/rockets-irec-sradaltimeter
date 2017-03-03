@@ -67,4 +67,10 @@ typedef struct{
   float z;
 } Bno_Data;
 
+typedef struct{
+  long event;
+} Event_Data;
+
+enum loggers {LOG_BMP, LOG_MMA, LOG_BNO, LOG_EVENT};
+
 #endif

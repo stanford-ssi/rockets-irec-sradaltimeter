@@ -1,4 +1,8 @@
 #include "Altimeter.h"
+#include "Logger.h"
+
+long kk = 0;
+long qq = 0;
 
 /*
 This is the only function that runs in the while(1) loop in main.cpp. It simply
@@ -8,10 +12,28 @@ void Altimeter::manageEvents(){
 
   if(flight_events.check(EVENT_MAIN)){
     mainUpdate();
-
+    logger.log();
   }
   if(flight_events.check(EVENT_READ_BMP)){
+    Event_Data ev = {kk};
+    logger.log_variable(LOG_EVENT, &ev);
+    kk++;
+    /*Bmp_Data* data = flight_sensors.readPressure();
+    Serial.println(data->pressure1);
+    Serial.println(data->pressure2);
+    delete data;
+    Serial.println("-");
+      Mma_Data* data2 = flight_sensors.readAcceleration();
+      Serial.println(data2->x);
+      Serial.println(data2->y);
+      delete data2;
+      Serial.println("--");*/
     //flight_data.updateBMP(sitl.readBMP());
+  }
+  if(flight_events.check(EVENT_READ_MMA)){
+    Mma_Data da = {qq/2., qq*2.};
+    logger.log_variable(LOG_MMA, &da);
+    qq++;
   }
 }
 
@@ -46,6 +68,20 @@ void Altimeter::startup(){
   delay(1000);
   analogWrite(BUZZER, 256);
   flight_state = IDLE;
+
+  /* Pessimistic approximation of the number of bytes:
+   * (100 Hz)*(5 sensors)*(16 byte/sensor)*(3 hour) = 86400000 bytes.
+   * Incidentally, that's the number of milliseconds in a day
+   * without taking into account sidereal periods or leap seconds. */
+  if (logger.initialize(86400000)) {
+    Serial.println("Logging initialized successfully");
+  }
+  logger.init_variable(LOG_BMP, "bmp", sizeof(Bno_Data));
+  logger.init_variable(LOG_MMA, "mma", sizeof(Mma_Data));
+  logger.init_variable(LOG_BNO, "bno", sizeof(Bno_Data));
+  logger.init_variable(LOG_EVENT, "event", sizeof(Event_Data));
+
+  logger.finish_headers();
 }
 
 /*
