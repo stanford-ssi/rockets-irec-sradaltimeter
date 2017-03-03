@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-#define NMEA_BUFF_SIZE 2048
+#define NMEA_BUFF_SIZE 512
 
 typedef struct{
   float latitude;
