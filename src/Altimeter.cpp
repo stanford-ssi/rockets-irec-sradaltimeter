@@ -94,6 +94,8 @@ void Altimeter::mainUpdate(){
       manageLEDs();
       //manageBuzzer();
       flight_data.writeBuffers();
+      flight_data.printBuffers();
+      flight_sensors.update();
       //flight_data.updateBMP(sitl.readBMP());
       flight_data.updateESense(flight_sensors.readESense());
       break;
