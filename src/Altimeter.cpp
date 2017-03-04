@@ -26,6 +26,14 @@ void Altimeter::manageEvents(){
     flight_data.updateMMA(mma_data);
     logger.log_variable(LOG_MMA, &mma_data);
   }
+  if(flight_events.check(EVENT_READ_GPS)){
+    flight_events.processor_busy = true;
+    Gps_Data gps_data = flight_sensors.readGPS();
+    flight_data.updateGPS(gps_data);
+    logger.log_variable(LOG_GPS, &gps_data);
+  }
+
+
   flight_events.processor_busy = false;
 }
 

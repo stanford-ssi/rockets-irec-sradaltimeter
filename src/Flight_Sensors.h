@@ -25,6 +25,7 @@ public:
   byte readIsoSense();
   Mma_Data readMMA();
   Bmp_Data readBMP();
+  Gps_Data readGPS();
   float readVbat();
 
 private:

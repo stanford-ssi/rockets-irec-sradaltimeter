@@ -77,6 +77,14 @@ Mma_Data Flight_Sensors::readMMA() {
   return ret;
 }
 
+Gps_Data Flight_Sensors::readGPS() {
+  Gps_Data gps_data;
+
+  //do the things here
+
+  return gps_data;
+}
+
 float Flight_Sensors::readVbat(){
   int read = analogRead(VSENSE);
   float vbat = ((float)read)/1023.0 * 3.3 / (VBAT_RATIO);

@@ -39,7 +39,7 @@ public:
   void manageEvents();
   void startup();
 
-  
+
 private:
 
   void mainUpdate();

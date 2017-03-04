@@ -15,8 +15,7 @@ Date: 1-6-2017
 #include "Flight_Configuration.h"
 
 const uint16_t DEFAULT_ARRAY_LENGTH  = 100;
-const uint16_t D_STORE_FREQ    = 1;
-const uint16_t D_SAMPLE_FREQ   = 30;
+const uint16_t DEFAULT_STORE_FREQ    = 1;
 
 #define BLOCK_COUNT 256000
 
@@ -62,12 +61,12 @@ private:
 class Flight_Data {
 public:
   Flight_Data() :
-    bmp_array(BMP_FREQ, D_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
-    mma_array(D_SAMPLE_FREQ, D_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
-    bno_array(D_SAMPLE_FREQ, D_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
-    gps_array(D_SAMPLE_FREQ, D_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
-    esense_array(D_SAMPLE_FREQ, D_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
-    isosense_array(D_SAMPLE_FREQ, D_STORE_FREQ, DEFAULT_ARRAY_LENGTH) {};
+    bmp_array(BMP_FREQ, DEFAULT_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
+    mma_array(MMA_FREQ, DEFAULT_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
+    bno_array(BNO_FREQ, DEFAULT_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
+    gps_array(GPS_FREQ, DEFAULT_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
+    esense_array(MAIN_FREQ, DEFAULT_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
+    isosense_array(MAIN_FREQ, DEFAULT_STORE_FREQ, DEFAULT_ARRAY_LENGTH) {};
 
   bool initialize();
   void updateESense(byte esense);
