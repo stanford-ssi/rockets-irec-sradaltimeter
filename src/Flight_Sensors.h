@@ -21,7 +21,6 @@ class Flight_Sensors {
 public:
   Flight_Sensors();
   bool initialize();
-
   byte readESense();
   byte readIsoSense();
   Mma_Data readMMA();

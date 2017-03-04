@@ -66,18 +66,20 @@ public:
     bmp_array(BMP_FREQ, D_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
     mma_array(D_SAMPLE_FREQ, D_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
     bno_array(D_SAMPLE_FREQ, D_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
+    gps_array(D_SAMPLE_FREQ, D_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
     esense_array(D_SAMPLE_FREQ, D_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
     isosense_array(D_SAMPLE_FREQ, D_STORE_FREQ, DEFAULT_ARRAY_LENGTH) {};
 
   bool initialize();
-  byte getESense();
-  byte getIsoSense();
   void updateESense(byte esense);
   void updateIsoSense(byte iso_sense);
   void updateBMP(Bmp_Data bmp_data);
   void updateMMA(Mma_Data mma_data);
-  void writeBuffers();
-  void printBuffers();
+  void updateBNO(Bno_Data bno_data);
+  void updateGPS(Gps_Data gps_data);
+  byte getESense();
+  byte getIsoSense();
+  long getGlobaltime();
 
 private:
   elapsedMicros global_time;
@@ -88,14 +90,10 @@ private:
   byte iso_sense;
   byte esense;
 
-  /* ----- SD Card ----- */
-  SdFat sd;
-  SdFile data_file;
-  uint32_t bgnBlock, endBlock;
-
   Circular_Array<Bmp_Data> bmp_array;
   Circular_Array<Mma_Data> mma_array;
   Circular_Array<Bno_Data> bno_array;
+  Circular_Array<Gps_Data> gps_array;
   Circular_Array<byte> esense_array;
   Circular_Array<byte> isosense_array;
 

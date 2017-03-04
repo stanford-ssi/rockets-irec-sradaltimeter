@@ -14,6 +14,7 @@ Date: 1-8-2017
 #include "Flight_Configuration.h"
 
 
+
 class Flight_Events{
 public:
   static volatile uint8_t events; // this is the variable that contains the events bit flags
@@ -25,6 +26,7 @@ public:
   that is is possible to pass the pointer to them to the interrupt
   timer object */
   static void updateClk(void);
+  static bool processor_busy;
 
 private:
   IntervalTimer update_clk_timer;

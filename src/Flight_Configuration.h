@@ -61,6 +61,13 @@ enum {
 
 // some structures for handeling data
 typedef struct{
+  float lon;
+  float lat;
+  float alt;
+  bool lock;
+} Gps_Data;
+
+typedef struct{
   float pressure1;
   float pressure2;
 } Bmp_Data;

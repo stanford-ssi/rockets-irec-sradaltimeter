@@ -7,21 +7,24 @@ This is the only function that runs in the while(1) loop in main.cpp. It simply
 checks the events and executes them
 */
 void Altimeter::manageEvents(){
-
   if(flight_events.check(EVENT_MAIN)){
+    flight_events.processor_busy = true;
     mainUpdate();
     logger.log();
   }
   if(flight_events.check(EVENT_READ_BMP)){
+    flight_events.processor_busy = true;
     Bmp_Data bmp_data = flight_sensors.readBMP();
     flight_data.updateBMP(bmp_data);
     logger.log_variable(LOG_BMP, &bmp_data);
   }
   if(flight_events.check(EVENT_READ_MMA)){
+    flight_events.processor_busy = true;
     Mma_Data mma_data = flight_sensors.readMMA();
     flight_data.updateMMA(mma_data);
     logger.log_variable(LOG_MMA, &mma_data);
   }
+  flight_events.processor_busy = false;
 }
 
 /*
