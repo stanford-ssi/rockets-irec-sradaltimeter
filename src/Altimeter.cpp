@@ -1,3 +1,4 @@
+#include <SPI.h>
 #include "Altimeter.h"
 #include "Logger.h"
 
@@ -14,6 +15,7 @@ void Altimeter::manageEvents(){
   }
   if(flight_events.check(EVENT_READ_BMP)){
     Bmp_Data bmp_data = flight_sensors.readBMP();
+    Serial.println(bmp_data.pressure1);
     flight_data.updateBMP(bmp_data);
     logger.log_variable(LOG_BMP, &bmp_data);
   }
@@ -63,7 +65,7 @@ void Altimeter::startup(){
   if (logger.initialize(86400000)) {
     Serial.println("Logging initialized successfully");
   }
-  logger.init_variable(LOG_BMP, "bmp", sizeof(Bno_Data));
+  logger.init_variable(LOG_BMP, "bmp", sizeof(Bmp_Data));
   logger.init_variable(LOG_MMA, "mma", sizeof(Mma_Data));
   logger.init_variable(LOG_BNO, "bno", sizeof(Bno_Data));
   logger.init_variable(LOG_EVENT, "event", sizeof(Event_Data));

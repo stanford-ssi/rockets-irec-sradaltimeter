@@ -11,7 +11,6 @@ Date: 1-6-2017
 #define FLIGHT_DATA_H
 
 #include <WProgram.h>
-#include <SdFat.h>
 #include "Salt_Rev0.h"
 #include "Flight_Configuration.h"
 
@@ -89,9 +88,6 @@ private:
   byte esense;
 
   /* ----- SD Card ----- */
-  SdFat sd;
-  SdFile data_file;
-  uint32_t bgnBlock, endBlock;
 
   Circular_Array<Bmp_Data> bmp_array;
   Circular_Array<Mma_Data> mma_array;
