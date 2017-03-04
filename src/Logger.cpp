@@ -74,7 +74,6 @@ int Logger::initialize(int rough_bytes) {
 
   strcpy((char*) blocks[to_insert].data, ":skeleton:");
   blocks[to_insert].count = 11;
-
   return success;
 }
 
@@ -135,11 +134,11 @@ void Logger::log() {
       cpy = next(cpy);
     }
     if (!sd.card()->writeStart(curBlock, num)) {
-        Serial.println("Couldn't write");
+        Serial.println("SD log: Couldn't write");
     }
     while (blocks[to_write].count == 510) {
       if (!sd.card()->writeData((uint8_t*)&blocks[to_write])) {
-          Serial.println("Couldn't write 2");
+          Serial.println("SD log: Couldn't write 2");
       }
       if (to_insert == to_write) {
         to_insert = next(to_insert);

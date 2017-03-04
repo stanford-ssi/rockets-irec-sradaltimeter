@@ -10,8 +10,17 @@ Date: 1-6-2017
 
 //#define SITL    //togle this to turn on SITL testing
 
-#define UPDATE_FREQ_HZ      30       //frequency of the main update
+/* Frequency settings. Values are in Hz */
+#define UPDATE_CLK_FREQ_HZ  200      //frequency of the update "clock"
+#define MAIN_FREQ           20      //frequency of the main update
+#define BNO_FREQ            50
+#define BMP_FREQ            50
+#define MMA_FREQ            50
+#define GPS_FREQ            20
+
 #define BEEP_FREQ_HZ        4        //frequency that the buzzer will beep at
+
+/*  */
 
 /*ettings for indicating sensors*/
 #define FSTART       0xAA

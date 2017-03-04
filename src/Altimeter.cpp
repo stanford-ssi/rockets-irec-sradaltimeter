@@ -1,8 +1,6 @@
 #include "Altimeter.h"
 #include "Logger.h"
 
-long kk = 0;
-long qq = 0;
 
 /*
 This is the only function that runs in the while(1) loop in main.cpp. It simply
@@ -15,25 +13,14 @@ void Altimeter::manageEvents(){
     logger.log();
   }
   if(flight_events.check(EVENT_READ_BMP)){
-    Event_Data ev = {kk};
-    logger.log_variable(LOG_EVENT, &ev);
-    kk++;
-    /*Bmp_Data* data = flight_sensors.readPressure();
-    Serial.println(data->pressure1);
-    Serial.println(data->pressure2);
-    delete data;
-    Serial.println("-");
-      Mma_Data* data2 = flight_sensors.readAcceleration();
-      Serial.println(data2->x);
-      Serial.println(data2->y);
-      delete data2;
-      Serial.println("--");*/
-    //flight_data.updateBMP(sitl.readBMP());
+    Bmp_Data bmp_data = flight_sensors.readBMP();
+    flight_data.updateBMP(bmp_data);
+    logger.log_variable(LOG_BMP, &bmp_data);
   }
   if(flight_events.check(EVENT_READ_MMA)){
-    Mma_Data da = {qq/2., qq*2.};
-    logger.log_variable(LOG_MMA, &da);
-    qq++;
+    Mma_Data mma_data = flight_sensors.readMMA();
+    flight_data.updateMMA(mma_data);
+    logger.log_variable(LOG_MMA, &mma_data);
   }
 }
 
@@ -92,10 +79,6 @@ void Altimeter::mainUpdate(){
   switch(flight_state){
     case IDLE:
       manageLEDs();
-      //manageBuzzer();
-      flight_data.writeBuffers();
-      //flight_data.updateBMP(sitl.readBMP());
-      flight_data.updateESense(flight_sensors.readESense());
       break;
     case ARMED:
       manageLEDs();
@@ -156,7 +139,7 @@ void Altimeter::manageBuzzer(){
     if(buzzer_counter > 30){buzzer_counter = 0;}
   }
   buzzer_freq_scaler++;
-  if(buzzer_freq_scaler >= UPDATE_FREQ_HZ/BEEP_FREQ_HZ){buzzer_freq_scaler = 0;}
+  if(buzzer_freq_scaler >= MAIN_FREQ/BEEP_FREQ_HZ){buzzer_freq_scaler = 0;}
 }
 
 /*

@@ -24,12 +24,12 @@ public:
 
   byte readESense();
   byte readIsoSense();
-  Mma_Data* readAcceleration();
-  //this function reads pressure data from the BMP280's and returns a pointer to the struct
-  Bmp_Data* readPressure();
+  Mma_Data readMMA();
+  Bmp_Data readBMP();
   float readVbat();
 
 private:
+
   Adafruit_BMP280 bmp1;
   Adafruit_BMP280 bmp2;
   Adafruit_BNO055 bno;

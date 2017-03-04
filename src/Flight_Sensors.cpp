@@ -58,21 +58,21 @@ byte Flight_Sensors::readIsoSense(){
   return iso_sense_array;
 }
 
-Bmp_Data* Flight_Sensors::readPressure(){
-  Bmp_Data* bmp_data = new Bmp_Data;
-  bmp_data->pressure1 = bmp1.readPressure();
-  bmp_data->pressure2 = bmp2.readPressure();
+Bmp_Data Flight_Sensors::readBMP(){
+  //void SpiFlushRxFifo(void);
+  Bmp_Data bmp_data;
+  bmp_data.pressure1 = bmp1.readPressure();
+  bmp_data.pressure2 = bmp2.readPressure();
   return bmp_data;
 }
 
-Mma_Data* Flight_Sensors::readAcceleration() {
+Mma_Data Flight_Sensors::readMMA() {
 
-  Mma_Data* ret = new Mma_Data;
+  Mma_Data ret;
   sensors_event_t evt;
-
   mma.getEvent(&evt);
-  ret->x = evt.acceleration.x;
-  ret->y = evt.acceleration.y;
+  ret.x = evt.acceleration.x;
+  ret.y = evt.acceleration.y;
 
   return ret;
 }

@@ -24,15 +24,15 @@ public:
   /* functions called by interrupt timers. they are static so
   that is is possible to pass the pointer to them to the interrupt
   timer object */
-  static void eventMain(void);
-  static void eventAltimeter(void);
-  static void eventAccel(void);
-
+  static void updateClk(void);
 
 private:
-  IntervalTimer main_loop_timer;
-  IntervalTimer altimeter_timer;
-  IntervalTimer accel_timer;
+  IntervalTimer update_clk_timer;
+  static volatile uint16_t main_precounter;
+  static volatile uint16_t bmp_precounter;
+  static volatile uint16_t bno_precounter;
+  static volatile uint16_t mma_precounter;
+  static volatile uint16_t gps_precounter;
 };
 
 #endif
