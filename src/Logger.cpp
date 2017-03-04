@@ -10,7 +10,7 @@
 int Logger::initialize(int rough_bytes) {
   int success = 1;
 
-  if (!sd.begin(SD_CS, SPI_FULL_SPEED)) {
+  if (!sd.begin(SD_CS, SPI_HALF_SPEED)) {
     sd.initErrorPrint();
   }
 

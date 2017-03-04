@@ -1,0 +1,40 @@
+{
+    "name": "SdFat", 
+    "repository": {
+        "url": "https://github.com/greiman/FreeRTOS-Arduino.git", 
+        "type": "git"
+    }, 
+    "platforms": [
+        "atmelavr", 
+        "atmelsam", 
+        "espressif8266", 
+        "intel_arc32", 
+        "microchippic32", 
+        "nordicnrf51", 
+        "teensy", 
+        "timsp430"
+    ], 
+    "frameworks": [
+        "arduino"
+    ], 
+    "version": "5d410b29e6", 
+    "export": {
+        "include": "libraries/SdFat"
+    }, 
+    "authors": [
+        {
+            "maintainer": false, 
+            "name": "Bill Greiman", 
+            "url": "https://github.com/greiman", 
+            "email": "fat16lib@sbcglobal.net"
+        }
+    ], 
+    "keywords": [
+        "system", 
+        "file", 
+        "card", 
+        "sd"
+    ], 
+    "id": 322, 
+    "description": "FAT16/FAT32 file system for SD cards"
+}
