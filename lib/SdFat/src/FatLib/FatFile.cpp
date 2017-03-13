@@ -847,6 +847,10 @@ dir_t* FatFile::readDirCache(bool skipReadOk) {
       }
       goto fail;
     }
+//   if (read(&b, 1) != 1) {
+//     DBG_FAIL_MACRO;
+//     goto fail;
+//    }
     m_curPosition += 31;
   } else {
     m_curPosition += 32;

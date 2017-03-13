@@ -2,7 +2,7 @@
  * This program demonstrates the freeClusterCount() call.
  */
 #include <SPI.h>
-#include "SdFat.h"
+#include <SdFat.h>
 /*
  * SD chip select pin.  Common values are:
  *
@@ -13,7 +13,7 @@
  */
 const uint8_t chipSelect = SS;
 
-#define TEST_FILE "Cluster.test"
+#define TEST_FILE "CLUSTER.TST"
 // file system
 SdFat sd;
 
@@ -35,20 +35,18 @@ void printFreeSpace() {
 //------------------------------------------------------------------------------
 void setup() {
   Serial.begin(9600);
-  // Wait for USB Serial 
-  while (!Serial) {
-    SysCall::yield();
-  }
+  while (!Serial) {}  // wait for Leonardo
+
   if (!MAINTAIN_FREE_CLUSTER_COUNT) {
     cout << F("Please edit SdFatConfig.h and set\n");
     cout << F("MAINTAIN_FREE_CLUSTER_COUNT nonzero for\n");
     cout << F("maximum freeClusterCount() performance.\n\n");
   }
-  // F stores strings in flash to save RAM
+  // pstr stores strings in flash to save RAM
   cout << F("Type any character to start\n");
-  while (!Serial.available()) {
-    SysCall::yield();
-  }
+  while (Serial.read() <= 0) {}
+  delay(400);  // catch Due reset problem
+
   // initialize the SD card at SPI_HALF_SPEED to avoid bus errors with
   // breadboards.  use SPI_FULL_SPEED for better performance.
   if (!sd.begin(chipSelect, SPI_HALF_SPEED)) {
@@ -75,7 +73,6 @@ void setup() {
   cout << F("Remove ") << TEST_FILE << endl << endl;
   sd.remove(TEST_FILE);
   printFreeSpace();
-  cout << F("Done") << endl;
 }
 //------------------------------------------------------------------------------
 void loop() {}

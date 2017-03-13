@@ -71,13 +71,8 @@ void istream::getBool(bool *b) {
     getNumber(b);
     return;
   }
-#ifdef __AVR__
   PGM_P truePtr = PSTR("true");
   PGM_P falsePtr = PSTR("false");
-#else  // __AVR__
-  const char* truePtr = "true";
-  const char* falsePtr = "false";
-#endif  // __AVR
   const uint8_t true_len = 4;
   const uint8_t false_len = 5;
   bool trueOk = true;
@@ -85,13 +80,8 @@ void istream::getBool(bool *b) {
   uint8_t i = 0;
   int c = readSkip();
   while (1) {
-#ifdef __AVR__
     falseOk = falseOk && c == pgm_read_byte(falsePtr + i);
     trueOk = trueOk && c == pgm_read_byte(truePtr + i);
-#else  // __AVR__
-    falseOk = falseOk && c == falsePtr[i];
-    trueOk = trueOk && c == truePtr[i];
-#endif  // __AVR__
     if (trueOk == false && falseOk == false) {
       break;
     }

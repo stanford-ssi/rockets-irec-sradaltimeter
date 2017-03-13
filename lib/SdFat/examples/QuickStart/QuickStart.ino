@@ -1,7 +1,7 @@
 // Quick hardware test.
 //
 #include <SPI.h>
-#include "SdFat.h"
+#include <SdFat.h>
 //
 // Set DISABLE_CHIP_SELECT to disable a second SPI device.
 // For example, with the Ethernet shield, set DISABLE_CHIP_SELECT
@@ -39,11 +39,8 @@ void reformatMsg() {
 
 void setup() {
   Serial.begin(9600);
-  
-  // Wait for USB Serial 
-  while (!Serial) {
-    SysCall::yield();
-  }
+  while (!Serial) {}  // Wait for Leonardo.
+
   cout << F("\nSPI pins:\n");
   cout << F("MISO: ") << int(MISO) << endl;
   cout << F("MOSI: ") << int(MOSI) << endl;
@@ -67,10 +64,8 @@ void setup() {
 
 bool firstTry = true;
 void loop() {
-  // Read any existing Serial data.
-  do {
-    delay(10);
-  } while (Serial.available() && Serial.read() >= 0);
+  // read any existing Serial data
+  while (Serial.read() >= 0) {}
 
   if (!firstTry) {
     cout << F("\nRestarting\n");
@@ -78,9 +73,9 @@ void loop() {
   firstTry = false;
 
   cout << F("\nEnter the chip select pin number: ");
-  while (!Serial.available()) {
-    SysCall::yield();
-  }
+  while (!Serial.available()) {}
+  delay(400);  // catch Due restart problem
+
   cin.readline();
   if (cin >> chipSelect) {
     cout << chipSelect << endl;
@@ -155,12 +150,8 @@ void loop() {
     reformatMsg();
     return;
   }
-  // Read any extra Serial data.
-  do {
-    delay(10);
-  } while (Serial.available() && Serial.read() >= 0);
+  // read any existing Serial data
+  while (Serial.read() >= 0) {}
   cout << F("\nSuccess!  Type any character to restart.\n");
-  while (!Serial.available()) {
-    SysCall::yield();
-  }
+  while (Serial.read() < 0) {}
 }

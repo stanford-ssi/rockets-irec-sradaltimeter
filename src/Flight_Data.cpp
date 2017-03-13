@@ -12,136 +12,54 @@ Date: 1-6-2017
 
 bool Flight_Data::initialize(){
   bool success = true;
-  /*global_time = 0;
-  success &= sd.begin(SD_CS, SPI_FULL_SPEED);
-  sd.ls(LS_SIZE|LS_R);
-  sd.mkdir("Flights");
-  sd.chdir("Flights");
-  String filepath;
-  filepath += "F000.csv";
-  while (sd.exists(filepath.c_str())) {
-    if (filepath[3] != '9') {
-      filepath[3]++;
-    } else if (filepath[2] != '9'){
-      filepath[2]++;
-      filepath[3] = '0';
-    } else if (filepath[1] != '9'){
-      filepath[1]++;
-      filepath[2] = 0;
-      filepath[3] = 0;
-    }
-  }
-  Serial.print("Creating new data file, ");
-  Serial.println(filepath);*/
-  // success &= data_file.contigu
-  // success &= data_file.open(filepath.c_str(),O_RDWR | O_CREAT | O_AT_END);
-  // data_file.println("lets try and write some shit");
-  // for(int i = 0; i < 1000; i++){
-  //   elapsedMicros timer = 0;
-  //   data_file.print(global_time);
-  //   data_file.print(",");
-  //   data_file.print("DAAAAAATTTTTTTAAAAAAAAATTTTTAAAAAA");
-  //   data_file.sync();
-  //   Serial.println(timer);
-  //   delay(10);
-  // }
-
   return success;
 }
-void Flight_Data::updateESense(byte esense_array){
-  this->esense_array = esense_array;
-  //dataLog(FESENSE);
+void Flight_Data::updateESense(byte esense){
+  esense_array.push(esense);
 }
 
-void Flight_Data::updateIsoSense(byte iso_sense_array){
-  this->iso_sense_array = iso_sense_array;
+void Flight_Data::updateIsoSense(byte iso_sense){
+  isosense_array.push(iso_sense);
+}
+
+void Flight_Data::updateBMP(Bmp_Data bmp_data){
+  bmp_array.push(bmp_data);
+}
+
+void Flight_Data::updateMMA(Mma_Data mma_data){
+  mma_array.push(mma_data);
+}
+
+void Flight_Data::updateBNO(Bno_Data bno_data){
+  bno_array.push(bno_data);
+}
+
+void Flight_Data::updateGPS(Gps_Data gps_data){
+  gps_array.push(gps_data);
 }
 
 byte Flight_Data::getESense(){
-  return this->esense_array;
+  return this->esense;
 }
+
 byte Flight_Data::getIsoSense(){
-  return this->iso_sense_array;
+  return this->iso_sense;
 }
 
-void Flight_Data::updateBMP(Bmp_Data* bmp_data){
-  this->bmp_data.pressure1 = bmp_data->pressure1;
-  this->bmp_data.pressure2 = bmp_data->pressure2;
-
-  delete bmp_data;
+long Flight_Data::getGlobaltime(){
+  return this->global_time;
 }
 
-void Flight_Data::writeBuffers(){
-  // int i = millis();
-  // test_buffer.push(i);
-}
-
-void Flight_Data::printBuffers(){
-  // int* buffer = test_buffer.getFullArray();
-  // for(int i = 0; i < ARRAYLENGTH; i++){
-  //   Serial.print(buffer[i]);
-  //   Serial.print(',');
-  // }
-  // Serial.println(' ');
-  // delete buffer;
-}
-
-/* ------ SD card ------ */
 
 
 
-void Flight_Data::printDirectory(File dir, int numTabs) {
-  while (true) {
-    File entry =  dir.openNextFile();
-    if (! entry) {
-      // no more files
-      break;
-    }
-    for (uint8_t i = 0; i < numTabs; i++) {
-      Serial.print('\t');
-    }
-    Serial.print(entry.name());
-    if (entry.isDirectory()) {
-      Serial.println("/");
-      printDirectory(entry, numTabs + 1);
-    } else {
-      // files have sizes, directories do not
-      Serial.print("\t\t");
-      Serial.println(entry.size(), DEC);
-    }
-    entry.close();
-  }
-}
-
-File Flight_Data::newDataFile(File dir){
-  int n = 0;
-  while(true){
-    n++;
-    File entry = dir.openNextFile();
-    if(! entry){
-      // no more files
-      String filepath;
-      filepath += dir.name();
-      filepath += "/f";
-      if(n<10) filepath += "00";      //pad with 0's
-      else if(n<100) filepath += "0";
-      filepath += n;
-      filepath += ".csv";
-      File newfile = sd.open(filepath.c_str(),FILE_WRITE);
-      if (newfile){
-        Serial.print("success  ");
-      } else {
-        Serial.print("fail  ");
-      }
-      //Serial.println(filepath);
-      return newfile;
-    }
-    entry.close();
-  }
-}
 
 /* ----- Circular_Storage_Buffer ------ */
 
+/*
+This function gets returns the value from a given number of milliseconds ago
+Need to add a check to make sure that the given time isn't too long ago
+*/
 template<class t_type> t_type Circular_Array<t_type>::getOld(uint32_t get_time){
    int16_t ind = static_cast<float>(sample_freq) * get_time / store_prescale / 1000;
    ind = head - ind;
@@ -149,7 +67,15 @@ template<class t_type> t_type Circular_Array<t_type>::getOld(uint32_t get_time){
    return data_array[ind];
 }
 
+/*
+Pushes a neew value to the array.
+*/
 template<class t_type> void Circular_Array<t_type>::push(t_type data){
+  /*Serial.print("Write Count: ");
+  Serial.print(write_count);
+  if(write_count == 0) Serial.print(millis());
+  Serial.print("  Head: ");
+  Serial.println(head); */
   write_count++;
   if(write_count >= store_prescale){
     write_count = 0;

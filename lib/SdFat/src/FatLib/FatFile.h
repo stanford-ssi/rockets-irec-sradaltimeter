@@ -37,6 +37,10 @@ class FatFileSystem;
 #ifdef __AVR__
 #include <avr/pgmspace.h>
 #else  // __AVR__
+#ifndef PGM_P
+/** pointer to flash for ARM */
+#define PGM_P const char*
+#endif  // PGM_P
 #ifndef PSTR
 /** store literal string in flash for ARM */
 #define PSTR(x) (x)
@@ -51,7 +55,7 @@ class FatFileSystem;
 #endif  // pgm_read_word
 #ifndef PROGMEM
 /** store in flash for ARM */
-#define PROGMEM
+#define PROGMEM const
 #endif  // PROGMEM
 #endif  // __AVR__
 //------------------------------------------------------------------------------

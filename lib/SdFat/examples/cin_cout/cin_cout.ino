@@ -2,7 +2,7 @@
  * Demo of ArduinoInStream and ArduinoOutStream
  */
 #include <SPI.h>
-#include "SdFat.h"
+#include <SdFat.h>
 
 // create serial output stream
 ArduinoOutStream cout(Serial);
@@ -15,14 +15,11 @@ ArduinoInStream cin(Serial, cinBuf, sizeof(cinBuf));
 //------------------------------------------------------------------------------
 void setup() {
   Serial.begin(9600);
-  // Wait for USB Serial 
-  while (!Serial) {
-    SysCall::yield();
-  }
+  while (!Serial) {}  // wait for Leonardo
 }
 //------------------------------------------------------------------------------
 void loop() {
-  int32_t n = 0;
+  int32_t n;
 
   cout << "\nenter an integer\n";
 

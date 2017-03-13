@@ -20,7 +20,7 @@
 
 /**
 \mainpage Arduino %SdFat Library
-<CENTER>Copyright &copy; 2012, 2013, 2014, 2015, 2016 by William Greiman
+<CENTER>Copyright &copy; 2012, 2013, 2014, 2015 by William Greiman
 </CENTER>
 
 \section Intro Introduction
@@ -114,6 +114,9 @@ FAT12 has not been well tested and requires additional flash.
 Set ENABLE_SPI_TRANSACTIONS nonzero to enable the SPI transaction feature
 of the standard Arduino SPI library.  You must include SPI.h in your
 programs when ENABLE_SPI_TRANSACTIONS is nonzero.
+
+Set ENABLE_SPI_YIELD nonzero to enable release of the SPI bus during
+SD card busy waits. ENABLE_SPI_TRANSACTIONS must be nonzero.
 
 \section SDPath Paths and Working Directories
 
@@ -282,10 +285,11 @@ display properly.  Examples this type name are UPPER.low, lower.TXT,
 UPPER.TXT, and lower.txt. 
 
 An application which writes to a file using print(), println() or
-write() must close the file or call sync() at the appropriate time to
+\link SdFile::write write() \endlink must close the file or call
+\link SdFile::sync() sync() \endlink at the appropriate time to
 force data and directory information to be written to the SD Card.
 
-Applications must use care calling sync() sync()
+Applications must use care calling \link SdFile::sync() sync() \endlink
 since 2048 bytes of I/O is required to update file and
 directory information.  This includes writing the current data block, reading
 the block that contains the directory entry for update, writing the directory
@@ -340,9 +344,11 @@ AnalogBinLogger - Fast AVR ADC logger - see the AnalogBinLoggerExtras folder.
 
 bench - A read/write benchmark.
 
+cin_cout - Demo of ArduinoInStream and ArduinoOutStream.
+
 dataLogger - A simple modifiable data logger.
 
-DirectoryFunctions - Demo of chdir(), ls(), mkdir(), and  rmdir().
+directoryFunctions - Demo of chdir(), ls(), mkdir(), and  rmdir().
 
 fgets - Demo of the fgets read line/string function.
 
@@ -362,13 +368,7 @@ QuickStart - A program to quickly test your SD card and SD shield/module.
 
 RawWrite - A test of raw write functions for contiguous files.
 
-ReadCsv - Function to read a CSV text file one field at a time.
-
-ReadCsvStream - Read a comma-separated value file using iostream extractors.
-
-ReadCsvArray - Read a two dimensional array from a CSV file.
-
-ReadWrite - Compatibility test of Arduino SD ReadWrite example.
+readCSV - Read a comma-separated value file using iostream extractors.
 
 ReadWriteSdFat - SdFat version of Arduino SD ReadWrite example.
 
@@ -382,6 +382,8 @@ SdInfo - Initialize an SD card and analyze its structure for trouble shooting.
 
 StdioBench - Demo and test of stdio style stream.
 
+StreamParseInt - Demo of the SD.h API and the File class parseInt() function.
+
 ThreeCards - Demonstrate simultaneous use of SdFat, SdFatLibSpi, SdFatSoftSpi.
 
 Timestamp - Sets file create, modify, and access timestamps.
@@ -389,6 +391,4 @@ Timestamp - Sets file create, modify, and access timestamps.
 TwoCards - Example using two SD cards.
 
 VolumeFreeSpace - Demonstrate the freeClusterCount() call.
-
-wipe - Example to wipe all data from an already formatted SD.
  */

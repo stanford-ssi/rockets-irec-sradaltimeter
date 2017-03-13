@@ -11,13 +11,11 @@ Date: 1-6-2017
 #define FLIGHT_DATA_H
 
 #include <WProgram.h>
-#include <SdFat.h>
 #include "Salt_Rev0.h"
 #include "Flight_Configuration.h"
 
-const uint16_t D_ARRAY_LENGTH  = 100;
-const uint16_t D_STORE_FREQ    = 1;
-const uint16_t D_SAMPLE_FREQ   = 30;
+const uint16_t DEFAULT_ARRAY_LENGTH  = 100;
+const uint16_t DEFAULT_STORE_FREQ    = 1;
 
 #define BLOCK_COUNT 256000
 
@@ -63,45 +61,39 @@ private:
 class Flight_Data {
 public:
   Flight_Data() :
-    bmp_buf(D_SAMPLE_FREQ, D_STORE_FREQ, D_ARRAY_LENGTH),
-    mma_buf(D_SAMPLE_FREQ, D_STORE_FREQ, D_ARRAY_LENGTH),
-    bno_buf(D_SAMPLE_FREQ, D_STORE_FREQ, D_ARRAY_LENGTH),
-    esense_buf(D_SAMPLE_FREQ, D_STORE_FREQ, D_ARRAY_LENGTH),
-    isosense_buf(D_SAMPLE_FREQ, D_STORE_FREQ, D_ARRAY_LENGTH) {};
+    bmp_array(BMP_FREQ, DEFAULT_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
+    mma_array(MMA_FREQ, DEFAULT_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
+    bno_array(BNO_FREQ, DEFAULT_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
+    gps_array(GPS_FREQ, DEFAULT_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
+    esense_array(MAIN_FREQ, DEFAULT_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
+    isosense_array(MAIN_FREQ, DEFAULT_STORE_FREQ, DEFAULT_ARRAY_LENGTH) {};
 
   bool initialize();
+  void updateESense(byte esense);
+  void updateIsoSense(byte iso_sense);
+  void updateBMP(Bmp_Data bmp_data);
+  void updateMMA(Mma_Data mma_data);
+  void updateBNO(Bno_Data bno_data);
+  void updateGPS(Gps_Data gps_data);
   byte getESense();
   byte getIsoSense();
-  void updateESense(byte esense_array);
-  void updateIsoSense(byte iso_sense_array);
-  void updateBMP(Bmp_Data* bmp_data);
-  void writeBuffers();
-  void printBuffers();
-
-  /* ----- SD Card ----- */
-  void dataLog(byte sensor);
-  File newDataFile(File dir);
-  void printDirectory(File dir, int numTabs);
+  long getGlobaltime();
 
 private:
-  elapsedMillis global_time;
-  elapsedMillis flight_time;
+  elapsedMicros global_time;
+  elapsedMicros flight_time;
   Bmp_Data bmp_data;
   Mma_Data mma_data;
   Bno_Data bno_data;
-  byte iso_sense_array;
-  byte esense_array;
+  byte iso_sense;
+  byte esense;
 
-  /* ----- SD Card ----- */
-  SdFat sd;
-  SdFile data_file;
-  uint32_t bgnBlock, endBlock;
-
-  Circular_Array<Bmp_Data> bmp_buf;
-  Circular_Array<Mma_Data> mma_buf;
-  Circular_Array<Bno_Data> bno_buf;
-  Circular_Array<byte> esense_buf;
-  Circular_Array<byte> isosense_buf;
+  Circular_Array<Bmp_Data> bmp_array;
+  Circular_Array<Mma_Data> mma_array;
+  Circular_Array<Bno_Data> bno_array;
+  Circular_Array<Gps_Data> gps_array;
+  Circular_Array<byte> esense_array;
+  Circular_Array<byte> isosense_array;
 
 
 };

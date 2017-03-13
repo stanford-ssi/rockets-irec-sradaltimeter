@@ -14,9 +14,9 @@
 // Print extra info for debug if DEBUG_PRINT is nonzero
 #define DEBUG_PRINT 0
 #include <SPI.h>
-#include "SdFat.h"
+#include <SdFat.h>
 #if DEBUG_PRINT
-#include "FreeStack.h"
+#include <FreeStack.h>
 #endif  // DEBUG_PRINT
 //
 // Change the value of chipSelect if your hardware does
@@ -74,7 +74,7 @@ void sdError_F(const __FlashStringHelper* str) {
     cout << F("SD error: ") << hex << int(card.errorCode());
     cout << ',' << int(card.errorData()) << dec << endl;
   }
-  SysCall::halt();
+  while (1);
 }
 //------------------------------------------------------------------------------
 #if DEBUG_PRINT
@@ -440,18 +440,8 @@ void formatCard() {
 void setup() {
   char c;
   Serial.begin(9600);
-  // Wait for USB Serial
-  while (!Serial) {
-    SysCall::yield();
-  }
-  cout << F("Type any character to start\n");
-  while (!Serial.available()) {
-    SysCall::yield();
-  }
-  // Discard any extra characters.
-  do {
-    delay(10);
-  } while (Serial.available() && Serial.read() >= 0);
+  while (!Serial) {} // wait for Leonardo
+
   cout << F(
          "\n"
          "This program can erase and/or format SD/SDHC cards.\n"
@@ -465,9 +455,8 @@ void setup() {
          "\n"
          "Warning, all data on the card will be erased.\n"
          "Enter 'Y' to continue: ");
-  while (!Serial.available()) {
-    SysCall::yield();
-  }
+  while (!Serial.available()) {}
+  delay(400);  // catch Due restart problem
 
   c = Serial.read();
   cout << c << endl;
@@ -475,10 +464,8 @@ void setup() {
     cout << F("Quiting, you did not enter 'Y'.\n");
     return;
   }
-  // Read any existing Serial data.
-  do {
-    delay(10);
-  } while (Serial.available() && Serial.read() >= 0);
+  // read any existing Serial data
+  while (Serial.read() >= 0) {}
 
   cout << F(
          "\n"
@@ -489,9 +476,7 @@ void setup() {
          "\n"
          "Enter option: ");
 
-  while (!Serial.available()) {
-    SysCall::yield();
-  }
+  while (!Serial.available()) {}
   c = Serial.read();
   cout << c << endl;
   if (!strchr("EFQ", c)) {

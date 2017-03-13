@@ -21,8 +21,8 @@
  */
 #ifdef __AVR__
 #include <SPI.h>
-#include "SdFat.h"
-#include "FreeStack.h"
+#include <SdFat.h>
+#include <FreeStack.h>
 #include "AnalogBinLogger.h"
 //------------------------------------------------------------------------------
 // Analog pin number list for a sample.  Pins may be in any order and pin
@@ -136,7 +136,7 @@ const uint8_t PIN_COUNT = sizeof(PIN_LIST)/sizeof(PIN_LIST[0]);
 const uint16_t MIN_ADC_CYCLES = 15;
 
 // Extra cpu cycles to setup ADC with more than one pin per sample.
-const uint16_t ISR_SETUP_ADC = PIN_COUNT > 1 ? 100 : 0;
+const uint16_t ISR_SETUP_ADC = 100;
 
 // Maximum cycles for timer0 system interrupt, millis, micros.
 const uint16_t ISR_TIMER0 = 160;
@@ -294,7 +294,8 @@ void adcInit(metadata_t* meta) {
   adps = ADC_PRESCALER;
 #else  // ADC_PRESCALER
   // Allow extra cpu cycles to change ADC settings if more than one pin.
-  int32_t adcCycles = (ticks - ISR_TIMER0)/PIN_COUNT - ISR_SETUP_ADC;
+  int32_t adcCycles = (ticks - ISR_TIMER0)/PIN_COUNT;
+  - (PIN_COUNT > 1 ? ISR_SETUP_ADC : 0);
 
   for (adps = 7; adps > 0; adps--) {
     if (adcCycles >= (MIN_ADC_CYCLES << adps)) {
@@ -384,7 +385,7 @@ void adcInit(metadata_t* meta) {
   meta->cpuFrequency = F_CPU;
   float sampleRate = (float)meta->cpuFrequency/meta->sampleInterval;
   Serial.print(F("Sample pins:"));
-  for (uint8_t i = 0; i < meta->pinCount; i++) {
+  for (int i = 0; i < meta->pinCount; i++) {
     Serial.print(' ');
     Serial.print(meta->pinNumber[i], DEC);
   }
@@ -470,6 +471,7 @@ void binaryToCsv() {
   csvStream.println();
   uint32_t tPct = millis();
   while (!Serial.available() && binFile.read(&buf, 512) == 512) {
+    uint16_t i;
     if (buf.count == 0) {
       break;
     }
@@ -791,10 +793,8 @@ void setup(void) {
 }
 //------------------------------------------------------------------------------
 void loop(void) {
-  // Read any Serial data.
-  do {
-    delay(10);
-  } while (Serial.available() && Serial.read() >= 0);
+  // discard any input
+  while (Serial.read() >= 0) {}
   Serial.println();
   Serial.println(F("type:"));
   Serial.println(F("c - convert file to csv"));
@@ -802,17 +802,15 @@ void loop(void) {
   Serial.println(F("e - overrun error details"));
   Serial.println(F("r - record ADC data"));
 
-  while(!Serial.available()) {
-    SysCall::yield();
-  }
+  while(!Serial.available()) {}
   char c = tolower(Serial.read());
   if (ERROR_LED_PIN >= 0) {
     digitalWrite(ERROR_LED_PIN, LOW);
   }
-  // Read any Serial data.
+  // Read any extra Serial data.
   do {
     delay(10);
-  } while (Serial.available() && Serial.read() >= 0);
+  } while (Serial.read() >= 0);
 
   if (c == 'c') {
     binaryToCsv();

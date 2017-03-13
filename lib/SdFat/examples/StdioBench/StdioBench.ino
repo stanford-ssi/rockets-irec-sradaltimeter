@@ -1,6 +1,6 @@
 // Benchmark comparing SdFile and StdioStream.
 #include <SPI.h>
-#include "SdFat.h"
+#include <SdFat.h>
 
 // Define PRINT_FIELD nonzero to use printField.
 #define PRINT_FIELD 0
@@ -17,27 +17,24 @@ StdioStream stdioFile;
 
 float f[100];
 char buf[20];
-const char* label[] =
+char* label[] =
 { "uint8_t 0 to 255, 100 times ", "uint16_t 0 to 20000",
   "uint32_t 0 to 20000", "uint32_t 1000000000 to 1000010000",
   "float nnn.ffff, 10000 times"
 };
 //------------------------------------------------------------------------------
 void setup() {
+  uint32_t m;
   uint32_t printSize;
-  uint32_t stdioSize = 0;
+  uint32_t stdioSize;
   uint32_t printTime;
-  uint32_t stdioTime = 0;
+  uint32_t stdioTime;
 
   Serial.begin(9600);
-  while (!Serial) {
-    SysCall::yield();
-  }
+  while (!Serial) {}
 
   Serial.println(F("Type any character to start"));
-  while (!Serial.available()) {
-    SysCall::yield();
-  }
+  while (!Serial.available());
   Serial.println(F("Starting test"));
   if (!sd.begin(SD_CS_PIN)) {
     sd.errorHalt();

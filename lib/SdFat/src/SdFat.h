@@ -23,16 +23,11 @@
  * \file
  * \brief SdFat class
  */
-#ifdef ARDUINO
 #include "SdSpiCard/SdSpiCard.h"
 #include "FatLib/FatLib.h"
-#else  // ARDUINO
-#include "SdSpiCard.h"
-#include "FatLib.h"
-#endif  // ARDUINO
 //------------------------------------------------------------------------------
 /** SdFat version YYYYMMDD */
-#define SD_FAT_VERSION 20160719
+#define SD_FAT_VERSION 20150718
 //==============================================================================
 /**
  * \class SdBaseFile
@@ -56,6 +51,7 @@ class SdBaseFile : public FatFile {
  * \class SdFile
  * \brief Class for backward compatibility.
  */
+
 class SdFile : public PrintFile {
  public:
   SdFile() {}
@@ -112,7 +108,19 @@ class SdFatBase : public FatFileSystem {
    * \param[in] msg Message to print.
    */
   void errorHalt(Print* pr, char const* msg);
-
+  /** %Print msg, any SD error code, and halt.
+   *
+   * \param[in] msg Message to print.
+   */
+  void errorHalt(const __FlashStringHelper* msg) {
+    errorHalt(&Serial, msg);
+  }
+  /** %Print msg, any SD error code, and halt.
+   *
+   * \param[in] pr Print destination.
+   * \param[in] msg Message to print.
+   */
+  void errorHalt(Print* pr, const __FlashStringHelper* msg);
   /** %Print any SD error code to Serial */
   void errorPrint() {
     errorPrint(&Serial);
@@ -134,7 +142,19 @@ class SdFatBase : public FatFileSystem {
    * \param[in] msg Message to print.
    */
   void errorPrint(Print* pr, char const* msg);
-
+  /** %Print msg, any SD error code.
+   *
+   * \param[in] msg Message to print.
+   */
+  void errorPrint(const __FlashStringHelper* msg) {
+    errorPrint(&Serial, msg);
+  }
+  /** %Print msg, any SD error code.
+   *
+   * \param[in] pr Print destination.
+   * \param[in] msg Message to print.
+   */
+  void errorPrint(Print* pr, const __FlashStringHelper* msg);
   /** Diagnostic call to initialize FatFileSystem - use for
    *  diagnostic purposes only.
    *  \return true for success else false.
@@ -163,7 +183,18 @@ class SdFatBase : public FatFileSystem {
    * \param[in] msg Message to print.
    */
   void initErrorHalt(Print* pr, char const *msg);
-
+  /**Print message, error details, and halt after SdFat::init() fails.
+    *
+    * \param[in] msg Message to print.
+    */
+  void initErrorHalt(const __FlashStringHelper* msg) {
+    initErrorHalt(&Serial, msg);
+  }
+  /**Print message, error details, and halt after SdFatBase::init() fails.
+   * \param[in] pr Print device for message.
+   * \param[in] msg Message to print.
+   */
+  void initErrorHalt(Print* pr, const __FlashStringHelper* msg);
   /** Print error details after SdFat::init() fails. */
   void initErrorPrint() {
     initErrorPrint(&Serial);
@@ -186,45 +217,6 @@ class SdFatBase : public FatFileSystem {
    * \param[in] msg Message to print.
    */
   void initErrorPrint(Print* pr, char const *msg);
-#if defined(ARDUINO) || defined(DOXYGEN)
-  /** %Print msg, any SD error code, and halt.
-   *
-   * \param[in] msg Message to print.
-   */
-  void errorHalt(const __FlashStringHelper* msg) {
-    errorHalt(&Serial, msg);
-  }
-  /** %Print msg, any SD error code, and halt.
-   *
-   * \param[in] pr Print destination.
-   * \param[in] msg Message to print.
-   */
-  void errorHalt(Print* pr, const __FlashStringHelper* msg);
-  /** %Print msg, any SD error code.
-   *
-   * \param[in] msg Message to print.
-   */
-  void errorPrint(const __FlashStringHelper* msg) {
-    errorPrint(&Serial, msg);
-  }
-  /** %Print msg, any SD error code.
-   *
-   * \param[in] pr Print destination.
-   * \param[in] msg Message to print.
-   */
-  void errorPrint(Print* pr, const __FlashStringHelper* msg);
-  /**Print message, error details, and halt after SdFat::init() fails.
-    *
-    * \param[in] msg Message to print.
-    */
-  void initErrorHalt(const __FlashStringHelper* msg) {
-    initErrorHalt(&Serial, msg);
-  }
-  /**Print message, error details, and halt after SdFatBase::init() fails.
-   * \param[in] pr Print device for message.
-   * \param[in] msg Message to print.
-   */
-  void initErrorHalt(Print* pr, const __FlashStringHelper* msg);
   /**Print message and error details and halt after SdFat::init() fails.
    *
    * \param[in] msg Message to print.
@@ -238,7 +230,6 @@ class SdFatBase : public FatFileSystem {
    * \param[in] msg Message to print.
    */
   void initErrorPrint(Print* pr, const __FlashStringHelper* msg);
-#endif  // defined(ARDUINO) || defined(DOXYGEN)
 
  private:
   uint8_t cardErrorCode() {
@@ -268,15 +259,6 @@ class SdFatBase : public FatFileSystem {
  */
 class SdFat : public SdFatBase {
  public:
-#if IMPLEMENT_SPI_INTERFACE_SELECTION
-  SdFat() {
-    m_spi.setSpiIf(0);
-  }
-  explicit SdFat(uint8_t spiIf) {
-    m_spi.setSpiIf(spiIf < SPI_INTERFACE_COUNT ? spiIf : 0);
-  }
-#endif  // IMPLEMENT_SPI_INTERFACE_SELECTION
-
   /** Initialize SD card and file system.
    *
    * \param[in] csPin SD card chip select pin.
@@ -294,7 +276,6 @@ class SdFat : public SdFatBase {
   bool cardBegin(uint8_t csPin = SS, uint8_t divisor = 2) {
     return card()->begin(&m_spi, csPin, divisor);
   }
-
  private:
   SpiDefault_t m_spi;
 };

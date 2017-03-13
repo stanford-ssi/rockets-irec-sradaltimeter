@@ -1,7 +1,7 @@
 // Simple demo of the Stream parsInt() member function.
 #include <SPI.h>
 // The next two lines replace #include <SD.h>.
-#include "SdFat.h"
+#include <SdFat.h>
 SdFat SD;
 
 // SD card chip select pin - Modify the value of csPin for your SD module.
@@ -12,13 +12,10 @@ File file;
 void setup() {
   Serial.begin(9600);
   // Wait for USB Serial.
-  while(!Serial) {
-    SysCall::yield();
-  }
+  while(!Serial) {}
   Serial.println(F("Type any character to start"));
-  while (!Serial.available()) {
-    SysCall::yield(); 
-  }
+  while (!Serial.available()) {}
+
   // Initialize the SD.
   if (!SD.begin(csPin)) {
     Serial.println(F("begin error"));
