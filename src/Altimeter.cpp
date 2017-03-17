@@ -4,8 +4,8 @@
 
 
 /*
-This is the only function that runs in the while(1) loop in main.cpp. It simply
-checks the events and executes them
+  This is the only function that runs in the while(1) loop in main.cpp. It simply
+  checks the events and executes them
 */
 void Altimeter::manageEvents(){
   if(flight_events.check(EVENT_MAIN)){
@@ -70,8 +70,8 @@ void Altimeter::manageEvents(){
 }
 
 /*
-The is the only function called before the while loop in main.cpp. It sets up
-and initializes everything.
+  The is the only function called before the while loop in main.cpp. It sets up
+  and initializes everything.
 */
 void Altimeter::startup(){
   pinMode(BUZZER, OUTPUT);
@@ -81,24 +81,24 @@ void Altimeter::startup(){
   Serial3.begin(9600);  //xbee Serial
 
   delay(1000);
-	/* gpio */
-	pinMode(LED_1, OUTPUT);
-	pinMode(LED_2, OUTPUT);
-	pinMode(LED_3, OUTPUT);
-	pinMode(LED_4, OUTPUT);
+  /* gpio */
+  pinMode(LED_1, OUTPUT);
+  pinMode(LED_2, OUTPUT);
+  pinMode(LED_3, OUTPUT);
+  pinMode(LED_4, OUTPUT);
 
-	pinMode(TRIG_1, OUTPUT);
-	pinMode(TRIG_2, OUTPUT);
-	pinMode(TRIG_3, OUTPUT);
-	pinMode(TRIG_4, OUTPUT);
+  pinMode(TRIG_1, OUTPUT);
+  pinMode(TRIG_2, OUTPUT);
+  pinMode(TRIG_3, OUTPUT);
+  pinMode(TRIG_4, OUTPUT);
   flight_data.initialize();
-  #ifdef SITL
-    sitl.initialize();
-  #else
-	  flight_sensors.initialize();
-  #endif
+#ifdef SITL
+  sitl.initialize();
+#else
+  flight_sensors.initialize();
+#endif
 
-	flight_events.initialize();
+  flight_events.initialize();
   delay(1000);
   flight_state = IDLE;
 
@@ -118,8 +118,8 @@ void Altimeter::startup(){
 }
 
 /*
-This is the main update function. It contains the switch case statement to execut
-differently depending on the vehicle state.
+  This is the main update function. It contains the switch case statement to execut
+  differently depending on the vehicle state.
 */
 void Altimeter::mainUpdate(){
   switch(flight_state){
@@ -143,8 +143,8 @@ void Altimeter::mainUpdate(){
 }
 
 /*
-This function manages the LED's of the altimeter. will be expanded in the future,
-maybe made into a full object. right now it simple incrementally blinks the 4 LEDS
+  This function manages the LED's of the altimeter. will be expanded in the future,
+  maybe made into a full object. right now it simple incrementally blinks the 4 LEDS
 */
 void Altimeter::manageLEDs(){
   digitalWrite(LED_1, led_counter == 0);
@@ -156,28 +156,28 @@ void Altimeter::manageLEDs(){
 }
 
 /*
-This function manages the buzzer. also will be expanded, currently just buzzes
-four times, low or high depending on if an ematch is connected or not. Also may
-be converted into an object at some point.
+  This function manages the buzzer. also will be expanded, currently just buzzes
+  four times, low or high depending on if an ematch is connected or not. Also may
+  be converted into an object at some point.
 */
 void Altimeter::manageBuzzer(){
   if(buzzer_freq_scaler == 0){
     switch(buzzer_counter){
-      case 0:
-        buzzInidicate(flight_data.getESense()&(1<<7));
-        break;
-      case 2:
-        buzzInidicate(flight_data.getESense()&(1<<6));
-        break;
-      case 4:
-        buzzInidicate(flight_data.getESense()&(1<<5));
-        break;
-      case 6:
-        buzzInidicate(flight_data.getESense()&(1<<4));
-        break;
-        default:
-          buzzOff();
-        break;
+    case 0:
+      buzzInidicate(flight_data.getESense()&(1<<7));
+      break;
+    case 2:
+      buzzInidicate(flight_data.getESense()&(1<<6));
+      break;
+    case 4:
+      buzzInidicate(flight_data.getESense()&(1<<5));
+      break;
+    case 6:
+      buzzInidicate(flight_data.getESense()&(1<<4));
+      break;
+    default:
+      buzzOff();
+      break;
     }
     buzzer_counter++;
     if(buzzer_counter > 30){buzzer_counter = 0;}
@@ -187,8 +187,8 @@ void Altimeter::manageBuzzer(){
 }
 
 /*
-This function turns on the buzzer, either high or low depending on the
-bool that it is passed.
+  This function turns on the buzzer, either high or low depending on the
+  bool that it is passed.
 */
 void Altimeter::buzzInidicate(bool buzz){
   if(buzz){
@@ -200,8 +200,8 @@ void Altimeter::buzzInidicate(bool buzz){
 }
 
 /*
-Really simple function that just turns off the buzzer. Mostly just made it it's
-own function cause I like the name.
+  Really simple function that just turns off the buzzer. Mostly just made it it's
+  own function cause I like the name.
 */
 void Altimeter::buzzOff(){
   analogWrite(BUZZER,256);

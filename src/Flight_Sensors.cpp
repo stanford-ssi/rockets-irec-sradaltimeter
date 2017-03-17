@@ -11,7 +11,8 @@ Flight_Sensors::Flight_Sensors()
   : bmp1(Adafruit_BMP280(BMP1_CS)),
     bmp2(Adafruit_BMP280(BMP2_CS)),
     bno(Adafruit_BNO055(BNO_ADR)),
-    mma(MMA65XX_Sensor(MMA_CS)){}
+    mma(MMA65XX_Sensor(MMA_CS)),
+    gps(&GPS_SERIAL) {}
 
 bool Flight_Sensors::initialize(){
   bool sucessful = true;
@@ -34,8 +35,13 @@ bool Flight_Sensors::initialize(){
   sucessful &= bmp1.begin();
   sucessful &= bmp2.begin();
   sucessful &= mma.begin();
+  sucessful &= gps.begin();
 
   return sucessful;
+}
+
+void Flight_Sensors::update() {
+  gps.update();
 }
 
 byte Flight_Sensors::readESense(){
@@ -78,11 +84,7 @@ Mma_Data Flight_Sensors::readMMA() {
 }
 
 Gps_Data Flight_Sensors::readGPS() {
-  Gps_Data gps_data;
-
-  //do the things here
-
-  return gps_data;
+    gps.readPosition();
 }
 
 float Flight_Sensors::readVbat(){

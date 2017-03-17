@@ -36,6 +36,9 @@ Date: 1-6-2017
 #define BUZZ_TONE_MID       4000
 #define BUZZ_TONE_LOW       3000
 
+//GPS serial port
+#define GPS_SERIAL Serial2
+
 //enumeration of flight states
 enum {
   STRTUP,
