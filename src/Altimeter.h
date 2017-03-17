@@ -41,7 +41,6 @@ public:
 
 
 private:
-
   void mainUpdate();
   void manageBuzzer();
   void manageLEDs();
@@ -49,6 +48,7 @@ private:
 
   void buzzInidicate(bool buzz);
   void buzzOff();
+
 
 };
 

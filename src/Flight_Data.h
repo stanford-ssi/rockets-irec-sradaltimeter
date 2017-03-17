@@ -14,7 +14,7 @@ Date: 1-6-2017
 #include "Salt_Rev0.h"
 #include "Flight_Configuration.h"
 
-const uint16_t DEFAULT_ARRAY_LENGTH  = 100;
+const uint16_t DEFAULT_ARRAY_LENGTH  = 10;
 const uint16_t DEFAULT_STORE_FREQ    = 1;
 
 #define BLOCK_COUNT 256000
@@ -77,9 +77,14 @@ public:
   void updateGPS(Gps_Data gps_data);
   byte getESense();
   byte getIsoSense();
+  Bmp_Data getBMPdata();
+  Mma_Data getMMAdata();
+  Bno_Data getBNOdata();
+  Gps_Data getGPSdata();
   long getGlobaltime();
 
 private:
+
   elapsedMicros global_time;
   elapsedMicros flight_time;
   Bmp_Data bmp_data;

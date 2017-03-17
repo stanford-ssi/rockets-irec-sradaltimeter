@@ -13,7 +13,7 @@ def get_string(buf, idx):
         i += 1
     return s, i+1
 
-f = open(sys.argv[1], "rb")
+f = open("data48.bin", "rb")
 
 t = f.read()
 
@@ -38,7 +38,7 @@ while True:
     if i == 0:
         version, of = get_string(t, i+2)
         if count != 510 or version != ":skeleton:":
-            print "Error parsing file - wrong format."
+            print("Error parsing file - wrong format.")
             exit(1)
         idx = i+2+of
         while True:
@@ -68,11 +68,11 @@ while True:
             idx += sz
             data[names[idd]].append(content)
     i += 512
-print "Parsed", nb, "blocks"
-print "Total", ne, "entries"
+print("Parsed", nb, "blocks")
+print("Total", ne, "entries")
 
-print "Checking if data is not corrupted...", ("We're good" if data['event'] == range(len(data['event'])) else "Welp it got corrupted")
-print "Average times"
+print("Checking if data is not corrupted...", ("We're good" if data['event'] == range(len(data['event'])) else "Welp it got corrupted"))
+print("Average times")
 for k in dts:
     v = np.array(dts[k])*1e-6
-    print k, 1/np.diff(v).mean()
+    print(k, 1/np.diff(v).mean())

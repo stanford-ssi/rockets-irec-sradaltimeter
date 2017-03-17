@@ -17,12 +17,12 @@ Date: 1-6-2017
 #define BMP_FREQ            50
 #define MMA_FREQ            50
 #define GPS_FREQ            20
-
+#define BUZZER_FREQ         20
 #define BEEP_FREQ_HZ        4        //frequency that the buzzer will beep at
 
 /*  */
 
-/*ettings for indicating sensors*/
+/*settings for indicating sensors*/
 #define FSTART       0xAA
 #define FESENSE      0x01
 #define FISOSENSE    0x02
@@ -56,6 +56,7 @@ enum {
   EVENT_READ_MMA =  0b00000100,
   EVENT_READ_BMP =  0b00001000,
   EVENT_READ_GPS =  0b00010000,
+  EVENT_BUZZER   =  0b00100000,
 };
 
 

@@ -12,20 +12,49 @@ void Altimeter::manageEvents(){
     flight_events.processor_busy = true;
     mainUpdate();
     logger.log();
+    manageLEDs();
+
+    //transmit data over xbee
+    /*
+    String xbee_tx =
+      String(flight_state) + ";" +
+      //flight_data.getGPSdata().lon + "," ;
+      //flight_data.getGPSdata().lat + ';' +
+      //flight_data.getBMPdata().pressure1 + ',' +
+      //flight_data.getBMPdata().pressure2 + ';' ;
+      //flight_data.getMMAdata().x + ',' +
+      //flight_data.getMMAdata().y + ';' ;
+      //flight_data.getESense() + ';' +
+      //flight_data.getIsoSense() + ';'
+    */
+    Serial.println("test message");
+    Serial3.print(flight_state);
+    Serial3.print("; ");
+    Serial3.print(flight_data.getGPSdata().lon);
+    Serial3.print(", ");
+    Serial3.print(flight_data.getGPSdata().lat);
+    Serial3.print("; ");
+    Serial3.print(flight_data.getBMPdata().pressure2);
+    Serial3.print("; ");
+    Serial3.print(flight_data.getGlobaltime());
+    Serial3.print("; ");
+    Serial3.println("test message");
+
   }
   if(flight_events.check(EVENT_READ_BMP)){
     flight_events.processor_busy = true;
     Bmp_Data bmp_data = flight_sensors.readBMP();
-    Serial.println(bmp_data.pressure1);
     flight_data.updateBMP(bmp_data);
     logger.log_variable(LOG_BMP, &bmp_data);
   }
+
   if(flight_events.check(EVENT_READ_MMA)){
     flight_events.processor_busy = true;
     Mma_Data mma_data = flight_sensors.readMMA();
     flight_data.updateMMA(mma_data);
     logger.log_variable(LOG_MMA, &mma_data);
   }
+
   if(flight_events.check(EVENT_READ_GPS)){
     flight_events.processor_busy = true;
     Gps_Data gps_data = flight_sensors.readGPS();
@@ -33,7 +62,10 @@ void Altimeter::manageEvents(){
     logger.log_variable(LOG_GPS, &gps_data);
   }
 
-
+  if(flight_events.check(EVENT_BUZZER)){
+    flight_events.processor_busy = true;
+    //manageBuzzer();
+  }
   flight_events.processor_busy = false;
 }
 
@@ -44,8 +76,10 @@ and initializes everything.
 void Altimeter::startup(){
   pinMode(BUZZER, OUTPUT);
   analogWriteFrequency(BUZZER, BUZZ_TONE_MID);
-  analogWrite(BUZZER, 256);
-  Serial.begin(9600);
+  analogWrite(BUZZER, 128);
+  Serial.begin(115200);   //usb Serial
+  Serial3.begin(9600);  //xbee Serial
+
   delay(1000);
 	/* gpio */
 	pinMode(LED_1, OUTPUT);
@@ -66,7 +100,6 @@ void Altimeter::startup(){
 
 	flight_events.initialize();
   delay(1000);
-  analogWrite(BUZZER, 256);
   flight_state = IDLE;
 
   /* Pessimistic approximation of the number of bytes:
@@ -80,8 +113,8 @@ void Altimeter::startup(){
   logger.init_variable(LOG_MMA, "mma", sizeof(Mma_Data));
   logger.init_variable(LOG_BNO, "bno", sizeof(Bno_Data));
   logger.init_variable(LOG_EVENT, "event", sizeof(Event_Data));
-
   logger.finish_headers();
+  buzzOff();
 }
 
 /*
@@ -91,10 +124,8 @@ differently depending on the vehicle state.
 void Altimeter::mainUpdate(){
   switch(flight_state){
     case IDLE:
-      manageLEDs();
       break;
     case ARMED:
-      manageLEDs();
       break;
     case PWRD_FLGHT:
       break;
@@ -152,7 +183,7 @@ void Altimeter::manageBuzzer(){
     if(buzzer_counter > 30){buzzer_counter = 0;}
   }
   buzzer_freq_scaler++;
-  if(buzzer_freq_scaler >= MAIN_FREQ/BEEP_FREQ_HZ){buzzer_freq_scaler = 0;}
+  if(buzzer_freq_scaler >= BUZZER_FREQ/BEEP_FREQ_HZ){buzzer_freq_scaler = 0;}
 }
 
 /*

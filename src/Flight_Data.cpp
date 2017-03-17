@@ -38,6 +38,10 @@ void Flight_Data::updateGPS(Gps_Data gps_data){
   gps_array.push(gps_data);
 }
 
+
+
+
+
 byte Flight_Data::getESense(){
   return this->esense;
 }
@@ -50,6 +54,18 @@ long Flight_Data::getGlobaltime(){
   return this->global_time;
 }
 
+Bmp_Data Flight_Data::getBMPdata(){
+  return bmp_array.getLast();
+}
+Mma_Data Flight_Data::getMMAdata(){
+  return mma_array.getLast();
+}
+Bno_Data Flight_Data::getBNOdata(){
+  return bno_array.getLast();
+}
+Gps_Data Flight_Data::getGPSdata(){
+  return gps_array.getLast();
+}
 
 
 

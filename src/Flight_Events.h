@@ -35,6 +35,7 @@ private:
   static volatile uint16_t bno_precounter;
   static volatile uint16_t mma_precounter;
   static volatile uint16_t gps_precounter;
+  static volatile uint16_t buzzer_precounter;
 };
 
 #endif
