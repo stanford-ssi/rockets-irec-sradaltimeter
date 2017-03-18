@@ -9,6 +9,7 @@ volatile uint16_t Flight_Events::bno_precounter = 0;
 volatile uint16_t Flight_Events::mma_precounter = 0;
 volatile uint16_t Flight_Events::gps_precounter = 0;
 volatile uint16_t Flight_Events::buzzer_precounter = 0;
+volatile uint16_t Flight_Events::filter_precounter = 0;
 bool Flight_Events::processor_busy = 0;
 
 void Flight_Events::initialize(){
@@ -57,9 +58,16 @@ void Flight_Events::updateClk(void){
     gps_precounter = 0;
     events |= EVENT_READ_GPS;
   }
+
   buzzer_precounter++;
   if(buzzer_precounter == UPDATE_CLK_FREQ_HZ/BUZZER_FREQ){
     gps_precounter = 0;
     events |= EVENT_BUZZER;
+  }
+
+  filter_precounter++;
+  if(filter_precounter == UPDATE_CLK_FREQ_HZ/FILTER_FREQ){
+    filter_precounter = 0;
+    events |= EVENT_FILTER;
   }
 }

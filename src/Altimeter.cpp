@@ -11,35 +11,6 @@ void Altimeter::manageEvents(){
   if(flight_events.check(EVENT_MAIN)){
     flight_events.processor_busy = true;
     mainUpdate();
-    logger.log();
-    manageLEDs();
-
-    //transmit data over xbee
-    /*
-    String xbee_tx =
-      String(flight_state) + ";" +
-      //flight_data.getGPSdata().lon + "," ;
-      //flight_data.getGPSdata().lat + ';' +
-      //flight_data.getBMPdata().pressure1 + ',' +
-      //flight_data.getBMPdata().pressure2 + ';' ;
-      //flight_data.getMMAdata().x + ',' +
-      //flight_data.getMMAdata().y + ';' ;
-      //flight_data.getESense() + ';' +
-      //flight_data.getIsoSense() + ';'
-    */
-    Serial.println("test message");
-    Serial3.print(flight_state);
-    Serial3.print("; ");
-    Serial3.print(flight_data.getGPSdata().lon);
-    Serial3.print(", ");
-    Serial3.print(flight_data.getGPSdata().lat);
-    Serial3.print("; ");
-    Serial3.print(flight_data.getBMPdata().pressure2);
-    Serial3.print("; ");
-    Serial3.print(flight_data.getGlobaltime());
-    Serial3.print("; ");
-    Serial3.println("test message");
-
   }
   if(flight_events.check(EVENT_READ_BMP)){
     flight_events.processor_busy = true;
@@ -67,6 +38,12 @@ void Altimeter::manageEvents(){
     //manageBuzzer();
   }
   flight_events.processor_busy = false;
+
+  if(flight_events.check(EVENT_FILTER)){
+    flight_events.processor_busy = true;
+    alt_filter.update(flight_data.getBMPdata(), flight_data.getBNOdata(), flight_data.getMMAdata());
+  }
+  flight_events.processor_busy = false;
 }
 
 /*
@@ -78,7 +55,7 @@ void Altimeter::startup(){
   analogWriteFrequency(BUZZER, BUZZ_TONE_MID);
   analogWrite(BUZZER, 128);
   Serial.begin(115200);   //usb Serial
-  Serial3.begin(9600);  //xbee Serial
+  xbeeSerial.begin(9600);  //xbee Serial
 
   delay(1000);
   /* gpio */
@@ -92,11 +69,7 @@ void Altimeter::startup(){
   pinMode(TRIG_3, OUTPUT);
   pinMode(TRIG_4, OUTPUT);
   flight_data.initialize();
-#ifdef SITL
-  sitl.initialize();
-#else
   flight_sensors.initialize();
-#endif
 
   flight_events.initialize();
   delay(1000);
@@ -122,6 +95,9 @@ void Altimeter::startup(){
   differently depending on the vehicle state.
 */
 void Altimeter::mainUpdate(){
+  logger.log();
+  manageLEDs();
+  transmitXbee();
   switch(flight_state){
     case IDLE:
       break;
@@ -140,6 +116,36 @@ void Altimeter::mainUpdate(){
     case RCVRED:
       break;
     }
+}
+
+
+void Altimeter::transmitXbee(){
+  long gtime = flight_data.getGlobaltime();
+  Bmp_Data bmp = flight_data.getBMPdata();
+  Mma_Data mma = flight_data.getMMAdata();
+  Bno_Data bno = flight_data.getBNOdata();
+  Gps_Data gps = flight_data.getGPSdata();
+  xbee_buf[0] = TX_START;
+  uint8_t *msg_ptr = xbee_buf + 1;
+  memcpy(msg_ptr, &gtime, sizeof(gtime));
+  msg_ptr += sizeof(gtime);
+  memcpy(msg_ptr, &bmp, sizeof(bmp));
+  msg_ptr += sizeof(bmp);
+  memcpy(msg_ptr, &mma, sizeof(mma));
+  msg_ptr += sizeof(mma);
+  memcpy(msg_ptr, &bno, sizeof(bno));
+  msg_ptr += sizeof(bno);
+  memcpy(msg_ptr, &gps, sizeof(gps));
+  msg_ptr += sizeof(gps);
+  uint8_t checksum = 0;
+  for(int i = 0; i < XBEE_BUF_LENGTH; i++){
+    checksum = xbee_buf[i] ^ checksum;
+  }
+  *msg_ptr = checksum;
+  msg_ptr++;
+  *msg_ptr = TX_END;
+  xbeeSerial.write(xbee_buf, XBEE_BUF_LENGTH);
+
 }
 
 /*

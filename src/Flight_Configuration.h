@@ -10,6 +10,9 @@ Date: 1-6-2017
 
 //#define SITL    //togle this to turn on SITL testing
 
+
+
+
 /* Frequency settings. Values are in Hz */
 #define UPDATE_CLK_FREQ_HZ  200      //frequency of the update "clock"
 #define MAIN_FREQ           20      //frequency of the main update
@@ -18,6 +21,7 @@ Date: 1-6-2017
 #define MMA_FREQ            50
 #define GPS_FREQ            20
 #define BUZZER_FREQ         20
+#define FILTER_FREQ         50
 #define BEEP_FREQ_HZ        4        //frequency that the buzzer will beep at
 
 /*  */
@@ -38,6 +42,7 @@ Date: 1-6-2017
 
 //GPS serial port
 #define GPS_SERIAL Serial2
+
 
 //enumeration of flight states
 enum {
@@ -60,6 +65,7 @@ enum {
   EVENT_READ_BMP =  0b00001000,
   EVENT_READ_GPS =  0b00010000,
   EVENT_BUZZER   =  0b00100000,
+  EVENT_FILTER   =  0b01000000,
 };
 
 
@@ -92,5 +98,15 @@ typedef struct{
 } Event_Data;
 
 enum loggers {LOG_BMP, LOG_MMA, LOG_BNO, LOG_EVENT, LOG_GPS};
+
+
+//xbee communication
+#define xbeeSerial Serial3
+#define TX_START  0x40
+#define TX_END    0xB0
+const uint8_t XBEE_BUF_LENGTH = 1 + sizeof(long) + sizeof(Bmp_Data)
+                              + sizeof(Mma_Data) + sizeof(Bno_Data)
+                              + sizeof(Gps_Data) + 1 + 1;
+
 
 #endif

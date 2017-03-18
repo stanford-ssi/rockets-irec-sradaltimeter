@@ -18,14 +18,19 @@
 #include "SITL.h"
 #include "Flight_Configuration.h"
 #include "Logger.h"
+#include "Altitude_Filter.h"
 
 
 class Altimeter{
 public:
   /* member objects */
+  Altitude_Filter alt_filter;
   Flight_Data flight_data;
-  Flight_Sensors flight_sensors;
-  //SITL sitl;
+  #ifdef SITL
+    SITL flight_sensors;
+  #else
+    Flight_Sensors flight_sensors;
+  #endif
   Flight_Events flight_events;
 
   Logger logger;
@@ -45,9 +50,11 @@ private:
   void manageBuzzer();
   void manageLEDs();
   void logData();
-
   void buzzInidicate(bool buzz);
   void buzzOff();
+  void transmitXbee();
+
+  uint8_t xbee_buf[XBEE_BUF_LENGTH];
 
 
 };
