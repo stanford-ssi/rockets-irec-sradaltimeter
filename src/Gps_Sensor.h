@@ -4,8 +4,6 @@
 #include <Arduino.h>
 #include "Flight_Configuration.h"
 
-#define NMEA_BUFF_SIZE 1024
-
 class Gps_Sensor {
  public:
   Gps_Sensor(HardwareSerial* _serial);
