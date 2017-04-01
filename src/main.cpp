@@ -1,5 +1,6 @@
 
 #include "Altimeter.h"
+#include <stdio.h>
 
 /* global object */
 Altimeter  altimeter;
@@ -11,4 +12,5 @@ int main(void)
   while(true){
     altimeter.manageEvents();
   }
+  return 0;
 }

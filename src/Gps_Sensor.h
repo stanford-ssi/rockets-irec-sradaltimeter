@@ -2,14 +2,9 @@
 #define GPS_SENSOR_H
 
 #include <Arduino.h>
+#include "Flight_Configuration.h"
 
-#define NMEA_BUFF_SIZE 2048
-
-typedef struct{
-  float latitude;
-  float longitude;
-} Gps_Pos;
-
+#define NMEA_BUFF_SIZE 1024
 
 class Gps_Sensor {
  public:
@@ -20,14 +15,16 @@ class Gps_Sensor {
    * and returns true if the data has updated.
    */
   bool update();
-  Gps_Pos* readPosition();
+  Gps_Data readPosition();
 
+  static bool parseUblox(const char* str, Gps_Data* data);
+  
  private:
   HardwareSerial* serial;
-  float latitude;
-  float longitude;
-  int buf_index;
   char nmea_buffer[NMEA_BUFF_SIZE];
+  int cur_buff_index;
+  Gps_Data data;
+  
 };
 
 #endif

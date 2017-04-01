@@ -22,7 +22,7 @@ class Flight_Sensors {
  public:
   Flight_Sensors();
   bool initialize();
-  void update();
+  bool update();
 
   byte readESense();
   byte readIsoSense();
