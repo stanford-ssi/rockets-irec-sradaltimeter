@@ -8,6 +8,7 @@ Date: 1-6-2017
 #define FLIGHT_CONFIGURATION_H
 
 #include <stdint.h>
+#include <QuickGPS.h>
 
 //#define SITL    //togle this to turn on SITL testing
 
@@ -69,13 +70,7 @@ enum {
 
 
 // some structures for handeling data
-typedef struct{
-  uint64_t time;
-  float lon;
-  float lat;
-  float alt;
-  bool lock;
-} Gps_Data;
+typedef QuickGPS::Data Gps_Data;
 
 typedef struct{
   float pressure1;
