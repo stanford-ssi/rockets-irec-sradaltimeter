@@ -97,6 +97,7 @@ void Altimeter::startup(){
   differently depending on the vehicle state.
 */
 void Altimeter::mainUpdate(){
+  flight_sensors.update();
   logger.log();
   manageLEDs();
   temp_counter++;
