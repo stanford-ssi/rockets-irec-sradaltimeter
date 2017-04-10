@@ -1,8 +1,8 @@
 // A simple data logger for the Arduino analog pins with optional DS1307
 // uses RTClib from https://github.com/adafruit/RTClib
 #include <SPI.h>
-#include "SdFat.h"
-#include "FreeStack.h"
+#include <SdFat.h>
+#include <FreeStack.h>
 
 #define SD_CHIP_SELECT  SS  // SD chip select pin
 #define USE_DS1307       0  // set nonzero to use DS1307 RTC
@@ -65,23 +65,16 @@ ostream& operator << (ostream& os, DateTime& dt) {
 //------------------------------------------------------------------------------
 void setup() {
   Serial.begin(9600);
-  
-  // Wait for USB Serial.
-  while (!Serial) {
-    SysCall::yield();
-  }
+  while (!Serial) {} // wait for Leonardo
+
   // F() stores strings in flash to save RAM
   cout << endl << F("FreeStack: ") << FreeStack() << endl;
 
 #if WAIT_TO_START
   cout << F("Type any character to start\n");
-  while (!Serial.available()) {
-    SysCall::yield();
-  }
-  // Discard input.
-  do {
-    delay(10);
-  } while(Serial.available() && Serial.read() >= 0);
+  while (Serial.read() <= 0) {}
+  delay(400);  // catch Due reset problem
+  while (Serial.read() >= 0) {}
 #endif  // WAIT_TO_START
 
 #if USE_DS1307
@@ -191,5 +184,5 @@ void loop() {
   }
   logfile.close();
   cout << F("Done!");
-  SysCall::halt();
+  while (1);
 }

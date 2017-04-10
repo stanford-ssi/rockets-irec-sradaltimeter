@@ -73,7 +73,7 @@ uint8_t const SD_CARD_ERROR_WRITE = 0X13;
 /** attempt to write protected block zero */
 uint8_t const SD_CARD_ERROR_WRITE_BLOCK_ZERO = 0X14;  // REMOVE - not used
 /** card did not go ready for a multiple block write */
-uint8_t const SD_CARD_ERROR_WRITE_MULTIPLE = 0X15;  // Not used
+uint8_t const SD_CARD_ERROR_WRITE_MULTIPLE = 0X15;
 /** card returned an error to a CMD13 status check after a write */
 uint8_t const SD_CARD_ERROR_WRITE_PROGRAMMING = 0X16;
 /** timeout occurred during write programming */
@@ -88,8 +88,6 @@ uint8_t const SD_CARD_ERROR_CMD59 = 0X1A;
 uint8_t const SD_CARD_ERROR_READ_CRC = 0X1B;
 /** SPI DMA error */
 uint8_t const SD_CARD_ERROR_SPI_DMA = 0X1C;
-/** CMD6 not accepted */
-uint8_t const SD_CARD_ERROR_CMD6 = 0X1D;
 //------------------------------------------------------------------------------
 // card types
 /** Standard capacity V1 SD card */
@@ -117,19 +115,17 @@ uint8_t const SPI_SIXTEENTH_SPEED = 32;
 //------------------------------------------------------------------------------
 // SD operation timeouts
 /** init timeout ms */
-unsigned const SD_INIT_TIMEOUT = 2000;
+uint16_t const SD_INIT_TIMEOUT = 2000;
 /** erase timeout ms */
-unsigned const SD_ERASE_TIMEOUT = 10000;
+uint16_t const SD_ERASE_TIMEOUT = 10000;
 /** read timeout ms */
-unsigned const SD_READ_TIMEOUT = 300;
+uint16_t const SD_READ_TIMEOUT = 300;
 /** write time out ms */
-unsigned const SD_WRITE_TIMEOUT = 600;
+uint16_t const SD_WRITE_TIMEOUT = 600;
 //------------------------------------------------------------------------------
 // SD card commands
 /** GO_IDLE_STATE - init card in spi mode if CS low */
 uint8_t const CMD0 = 0X00;
-/** SWITCH_FUNC - Switch Function Command */
-uint8_t const CMD6 = 0X06;
 /** SEND_IF_COND - verify SD Memory Card interface operating condition.*/
 uint8_t const CMD8 = 0X08;
 /** SEND_CSD - read the Card Specific Data (CSD register) */

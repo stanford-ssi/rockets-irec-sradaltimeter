@@ -21,21 +21,17 @@ const int chipSelect = 4;
 
  */
 #include <SPI.h>
-#include "SdFat.h"
+#include <SdFat.h>
 SdFat sd;
 SdFile myFile;
 
 void setup() {
   Serial.begin(9600);
-  
-  // Wait for USB Serial 
-  while (!Serial) {
-    SysCall::yield();
-  }
+  while (!Serial) {}  // wait for Leonardo
   Serial.println("Type any character to start");
-  while (!Serial.available()) {
-    SysCall::yield();
-  }
+  while (Serial.read() <= 0) {}
+  delay(400);  // catch Due reset problem
+
   // Initialize SdFat or print a detailed error message and halt
   // Use half speed like the native library.
   // change to SPI_FULL_SPEED for more performance.

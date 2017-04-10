@@ -65,8 +65,6 @@ class ibufstream : public istream {
     pos->position = m_pos;
   }
   bool seekoff(off_type off, seekdir way) {
-    (void)off;
-    (void)way;
     return false;
   }
   bool seekpos(pos_type pos) {
@@ -139,8 +137,6 @@ class obufstream : public ostream {
     }
   }
   bool seekoff(off_type off, seekdir way) {
-    (void)off;
-    (void)way;
     return false;
   }
   bool seekpos(pos_type pos) {

@@ -25,7 +25,7 @@
  */
 #include "FatLibConfig.h"
 #if ENABLE_ARDUINO_FEATURES
-#include "SysCall.h"
+#include <Arduino.h>
 #include "bufstream.h"
 //==============================================================================
 /**
@@ -50,9 +50,7 @@ class ArduinoInStream : public ibufstream {
     size_t i = 0;
     uint32_t t;
     m_line[0] = '\0';
-    while (!m_hw->available()) {
-      SysCall::yield();
-    }
+    while (!m_hw->available()) {}
 
     while (1) {
       t = millis();
@@ -79,8 +77,6 @@ done:
    * \return true/false.
    */
   bool seekoff(off_type off, seekdir way) {
-    (void)off;
-    (void)way;
     return false;
   }
   /** Internal - do not use.
@@ -88,7 +84,6 @@ done:
    * \return true/false.
    */
   bool seekpos(pos_type pos) {
-    (void)pos;
     return false;
   }
 
@@ -126,12 +121,9 @@ class ArduinoOutStream : public ostream {
     m_pr->write(str);
   }
   bool seekoff(off_type off, seekdir way) {
-    (void)off;
-    (void)way;
     return false;
   }
   bool seekpos(pos_type pos) {
-    (void)pos;
     return false;
   }
   bool sync() {

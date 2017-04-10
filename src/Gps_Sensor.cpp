@@ -15,14 +15,14 @@ bool Gps_Sensor::update() {
 
   bool lat_real = false;
   bool log_real = false;
-  
+
   while (serial->available()) {
     //We want to have a max so we don't parse a too-long string. Better to just fail
     //then take forever
     if (buf_index >= NMEA_BUFF_SIZE) {
       buf_index = 0;
     }
-    
+
     char in = serial->read();
     if (in == '\n') {
       nmea_buffer[buf_index++] = '\0';
@@ -72,7 +72,7 @@ bool Gps_Sensor::update() {
 	}
 	data = strtok(NULL, ",");
       }
-      
+
     } else {
       nmea_buffer[buf_index++] = in;
     }
@@ -80,8 +80,8 @@ bool Gps_Sensor::update() {
   return lat_real && log_real;
 }
 
-Gps_Data* Gps_Sensor::readPosition() {
-  Gps_Data* ret = new Gps_Data;
+Gps_Pos* Gps_Sensor::readPosition() {
+  Gps_Pos* ret = new Gps_Pos;
   ret->latitude = latitude;
   ret->longitude = longitude;
   return ret;

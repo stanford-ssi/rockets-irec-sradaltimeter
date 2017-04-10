@@ -2,7 +2,7 @@
  * Append a line to a file - demo of pathnames and streams
  */
 #include <SPI.h>
-#include "SdFat.h"
+#include <SdFat.h>
 
 // SD chip select pin
 const uint8_t chipSelect = SS;
@@ -36,15 +36,11 @@ void logEvent(const char *msg) {
 //------------------------------------------------------------------------------
 void setup() {
   Serial.begin(9600);
-  // Wait for USB Serial 
-  while (!Serial) {
-    SysCall::yield();
-  }
+  while (!Serial) {}  // wait for Leonardo
+
   // F() stores strings in flash to save RAM
   cout << F("Type any character to start\n");
-  while (!Serial.available()) {
-    SysCall::yield();
-  }
+  while (Serial.read() <= 0) {}
   delay(400);  // catch Due reset problem
 
   // initialize the SD card at SPI_HALF_SPEED to avoid bus errors with

@@ -7,13 +7,9 @@ append - This sketch creates a large file by successive
 
 average - A demonstration of parsing floating point numbers.
 
-BaseExtCaseTest - Long file name test.
-
 benchSD - A read/write benchmark for the standard Arduino SD.h library.
 
-bufstream - ibufsteam to parse a line and obufstream to format a line.
-
-cin_cout - Demo of ArduinoInStream and ArduinoOutStream.             
+bufstream - ibufsteam to parse a line and obufstream to format a line.             
 
 eventlog - Append a line to a file - demo of pathnames and streams.
 
@@ -30,5 +26,3 @@ readlog - Read file. Demo of pathnames and current working directory.
 SD_Size - Determine flash used by SD.h example.
 
 SdFatSize - Determine flash used by SdFat.
-
-StreamParseInt - Simple demo of the Stream parsInt() member function.

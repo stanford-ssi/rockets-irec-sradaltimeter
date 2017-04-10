@@ -19,6 +19,7 @@ class Logger{
 
    void finish_headers();
 
+
 private:
 
   uint8_t *ptr();

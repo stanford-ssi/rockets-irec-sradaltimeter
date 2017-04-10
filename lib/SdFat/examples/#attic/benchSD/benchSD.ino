@@ -18,20 +18,14 @@ uint8_t buf[BUF_SIZE];
 File file;
 
 //------------------------------------------------------------------------------
-void error(const char* s) {
+void error(char* s) {
   Serial.println(s);
-  while (1) {
-    yield();
-  }
+  while(1);
 }
 //------------------------------------------------------------------------------
 void setup() {
   Serial.begin(9600);
-  
-  // Wait for USB Serial 
-  while (!Serial) {
-    yield();
-  }
+  while (!Serial) {} // wait for Leonardo
 }
 //------------------------------------------------------------------------------
 void loop() {
@@ -39,17 +33,14 @@ void loop() {
   uint32_t minLatency;
   uint32_t totalLatency;
 
-  // Discard any input.
-  do {
-    delay(10);
-  } while (Serial.available() && Serial.read() >= 0);
+  // discard any input
+  while (Serial.read() >= 0) {}
 
   // F() stores strings in flash to save RAM
   Serial.println(F("Type any character to start"));
-  
-  while (!Serial.available()) {
-    yield();
-  }
+  while (Serial.read() <= 0) {}
+  delay(400);  // catch Due reset problem
+
   if (!SD.begin(chipSelect)) {
     error("begin");
   }

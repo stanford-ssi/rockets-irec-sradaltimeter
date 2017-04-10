@@ -2,8 +2,8 @@
  * This program is a simple Print benchmark.
  */
 #include <SPI.h>
-#include "SdFat.h"
-#include "FreeStack.h"
+#include <SdFat.h>
+#include <FreeStack.h>
 
 // SD chip select pin
 const uint8_t chipSelect = SS;
@@ -25,9 +25,8 @@ ArduinoOutStream cout(Serial);
 //------------------------------------------------------------------------------
 void setup() {
   Serial.begin(9600);
-  // Wait for USB Serial 
   while (!Serial) {
-    SysCall::yield();
+    // wait for Leonardo
   }
 }
 //------------------------------------------------------------------------------
@@ -36,14 +35,11 @@ void loop() {
   uint32_t minLatency;
   uint32_t totalLatency;
 
-  // Read any existing Serial data.
-  do {
-    delay(10);
-  } while (Serial.available() && Serial.read() >= 0);
-  // F stores strings in flash to save RAM
+  while (Serial.read() >= 0) {
+  }
+  // pstr stores strings in flash to save RAM
   cout << F("Type any character to start\n");
-  while (!Serial.available()) {
-    SysCall::yield();
+  while (Serial.read() <= 0) {
   }
   delay(400);  // catch Due reset problem
 

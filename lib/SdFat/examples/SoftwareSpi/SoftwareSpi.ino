@@ -4,7 +4,7 @@
 // This example will also run on an Uno and other boards using software SPI.
 //
 #include <SPI.h>
-#include "SdFat.h"
+#include <SdFat.h>
 #if SD_SPI_CONFIGURATION >= 3  // Must be set in SdFat/SdFatConfig.h
 //
 // Pin numbers in templates must be constants.
@@ -23,14 +23,10 @@ SdFile file;
 
 void setup() {
   Serial.begin(9600);
-  // Wait for USB Serial 
-  while (!Serial) {
-    SysCall::yield();
-  }
+  while (!Serial) {}  // Wait for Leonardo
+
   Serial.println("Type any character to start");
-  while (!Serial.available()) {
-    SysCall::yield();
-  }
+  while (Serial.read() <= 0) {}
 
   if (!sd.begin(SD_CHIP_SELECT_PIN)) {
     sd.initErrorHalt();

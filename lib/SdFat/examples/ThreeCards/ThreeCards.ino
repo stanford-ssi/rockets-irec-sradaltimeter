@@ -2,8 +2,8 @@
  * Example use of three SD cards.
  */
 #include <SPI.h>
-#include "SdFat.h"
-#include "FreeStack.h"
+#include <SdFat.h>
+#include <FreeStack.h>
 #if SD_SPI_CONFIGURATION >= 3  // Must be set in SdFat/SdFatConfig.h
 
 // SD1 is a microSD on hardware SPI pins 50-52
@@ -45,22 +45,19 @@ void list() {
 //------------------------------------------------------------------------------
 void setup() {
   Serial.begin(9600);
-  // Wait for USB Serial 
-  while (!Serial) {
-    SysCall::yield();
-  }
+  while (!Serial) {}  // wait for Leonardo
   Serial.print(F("FreeStack: "));
 
   Serial.println(FreeStack());
 
   // fill buffer with known data
-  for (size_t i = 0; i < sizeof(buf); i++) {
+  for (int i = 0; i < sizeof(buf); i++) {
     buf[i] = i;
   }
+
   Serial.println(F("type any character to start"));
-  while (!Serial.available()) {
-    SysCall::yield();
-  }
+  while (Serial.read() <= 0) {}
+
   // disable sd2 while initializing sd1
   pinMode(SD2_CS, OUTPUT);
   digitalWrite(SD2_CS, HIGH);
@@ -143,7 +140,7 @@ void setup() {
   Serial.println(F("Writing SD1:/Dir1/TEST1.bin"));
 
   // write data to /Dir1/TEST1.bin on sd1
-  for (uint16_t i = 0; i < NWRITE; i++) {
+  for (int i = 0; i < NWRITE; i++) {
     if (file1.write(buf, sizeof(buf)) != sizeof(buf)) {
       sd1.errorExit("sd1.write");
     }
@@ -171,7 +168,7 @@ void setup() {
     if (n == 0) {
       break;
     }
-    if ((int)file2.write(buf, n) != n) {
+    if (file2.write(buf, n) != n) {
       sd2.errorExit("write3");
     }
   }
@@ -199,7 +196,7 @@ void setup() {
     if (n != sizeof(buf)) {
       sd2.errorExit("read2");
     }
-    if ((int)file3.write(buf, n) != n) {
+    if (file3.write(buf, n) != n) {
       sd3.errorExit("write2");
     }
   }
@@ -209,11 +206,11 @@ void setup() {
   // Verify content of file3
   file3.rewind();
   Serial.println(F("Verifying content of TEST3.bin"));
-  for (uint16_t i = 0; i < NWRITE; i++) {
+  for (int i = 0; i < NWRITE; i++) {
     if (file3.read(buf, sizeof(buf)) != sizeof(buf)) {
       sd3.errorExit("sd3.read");
     }
-    for (size_t j = 0; j < sizeof(buf); j++) {
+    for (int j = 0; j < sizeof(buf); j++) {
       if (j != buf[j]) {
         sd3.errorExit("Verify error");
       }

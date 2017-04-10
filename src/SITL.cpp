@@ -37,21 +37,59 @@ byte SITL::readIsoSense(){
   }
 }
 
-Bmp_Data* SITL::readBMP(){
-  Bmp_Data* bmp_data = new Bmp_Data;
+Bmp_Data SITL::readBMP(){
+  Bmp_Data bmp_data;
   request(FBMP);
+  int data_len = sizeof(Bmp_Data);
   while(true){
-    if(Serial.available() == 8){
-      byte read[8];
+    if(Serial.available() == data_len){
+      byte read[data_len];
       for(int i = 0;i < 8;i++){
         read[i]= Serial.read();
       }
-      bmp_data->pressure1 = bytes2Float(read);
-      bmp_data->pressure2 = bytes2Float(read+4);
+      bmp_data.pressure1 = bytes2Float(read);
+      bmp_data.pressure2 = bytes2Float(read+4);
       return bmp_data;
     }
   }
 }
+
+Mma_Data SITL::readMMA(){
+  Mma_Data mma_data;
+  request(FMMA);
+  int data_len = sizeof(Bmp_Data);
+  while(true){
+    if(Serial.available() == data_len){
+      byte read[data_len];
+      for(int i = 0;i < 8;i++){
+        read[i]= Serial.read();
+      }
+      mma_data.x = bytes2Float(read);
+      mma_data.y = bytes2Float(read+4);
+      return mma_data;
+    }
+  }
+}
+
+Gps_Data SITL::readGPS(){
+  Gps_Data data;
+  request(FGPS);
+  int data_len = sizeof(Gps_Data);
+  while(true){
+    if(Serial.available() == data_len){
+      byte read[data_len];
+      for(int i = 0;i < 8;i++){
+        read[i]= Serial.read();
+      }
+      data.lat = bytes2Float(read);
+      data.lon = bytes2Float(read+4);
+      data.alt = bytes2Float(read+8);
+      data.lock = read[12];
+      return data;
+    }
+  }
+}
+
 
 float SITL::readVbat(){
   int read = analogRead(VSENSE);

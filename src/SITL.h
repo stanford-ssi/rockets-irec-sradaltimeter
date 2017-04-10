@@ -13,7 +13,9 @@ public:
   bool initialize();
   byte readESense();
   byte readIsoSense();
-  Bmp_Data* readBMP();
+  Bmp_Data readBMP();
+  Mma_Data readMMA();
+  Gps_Data readGPS();
   float readVbat();
 
 private:

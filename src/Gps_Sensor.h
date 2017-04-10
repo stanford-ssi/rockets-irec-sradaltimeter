@@ -8,7 +8,7 @@
 typedef struct{
   float latitude;
   float longitude;
-} Gps_Data;
+} Gps_Pos;
 
 
 class Gps_Sensor {
@@ -20,8 +20,8 @@ class Gps_Sensor {
    * and returns true if the data has updated.
    */
   bool update();
-  Gps_Data* readPosition();
-  
+  Gps_Pos* readPosition();
+
  private:
   HardwareSerial* serial;
   float latitude;
