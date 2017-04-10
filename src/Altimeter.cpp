@@ -37,7 +37,6 @@ void Altimeter::manageEvents(){
     flight_events.processor_busy = true;
     //manageBuzzer();
   }
-  flight_events.processor_busy = false;
 
   if(flight_events.check(EVENT_FILTER)){
     flight_events.processor_busy = true;
@@ -55,14 +54,17 @@ void Altimeter::startup(){
   analogWriteFrequency(BUZZER, BUZZ_TONE_MID);
   analogWrite(BUZZER, 128);
   Serial.begin(115200);   //usb Serial
-  xbeeSerial.begin(9600);  //xbee Serial
-
-  delay(1000);
-  /* gpio */
+  xbeeSerial.begin(115200);  //xbee Serial
   pinMode(LED_1, OUTPUT);
   pinMode(LED_2, OUTPUT);
   pinMode(LED_3, OUTPUT);
   pinMode(LED_4, OUTPUT);
+  digitalWrite(LED_1, true);
+  digitalWrite(LED_2, true);
+  digitalWrite(LED_3, true);
+  digitalWrite(LED_4, true);
+  delay(1000);
+  /* gpio */
 
   pinMode(TRIG_1, OUTPUT);
   pinMode(TRIG_2, OUTPUT);
@@ -70,10 +72,6 @@ void Altimeter::startup(){
   pinMode(TRIG_4, OUTPUT);
   flight_data.initialize();
   flight_sensors.initialize();
-
-  flight_events.initialize();
-  delay(1000);
-  flight_state = IDLE;
 
   /* Pessimistic approximation of the number of bytes:
    * (100 Hz)*(5 sensors)*(16 byte/sensor)*(3 hour) = 86400000 bytes.
@@ -87,6 +85,10 @@ void Altimeter::startup(){
   logger.init_variable(LOG_BNO, "bno", sizeof(Bno_Data));
   logger.init_variable(LOG_EVENT, "event", sizeof(Event_Data));
   logger.finish_headers();
+  flight_events.initialize();
+
+  xbeeSerial.println("Unit Initialized");
+  //Serial.println("Unit Initialized");
   buzzOff();
 }
 
@@ -97,7 +99,11 @@ void Altimeter::startup(){
 void Altimeter::mainUpdate(){
   logger.log();
   manageLEDs();
-  transmitXbee();
+  temp_counter++;
+  if(temp_counter == 100){
+    temp_counter = 0;
+    transmitXbee();
+  }
   switch(flight_state){
     case IDLE:
       break;
@@ -120,13 +126,15 @@ void Altimeter::mainUpdate(){
 
 
 void Altimeter::transmitXbee(){
+
   long gtime = flight_data.getGlobaltime();
   Bmp_Data bmp = flight_data.getBMPdata();
   Mma_Data mma = flight_data.getMMAdata();
   Bno_Data bno = flight_data.getBNOdata();
   Gps_Data gps = flight_data.getGPSdata();
   xbee_buf[0] = TX_START;
-  uint8_t *msg_ptr = xbee_buf + 1;
+  xbee_buf[1] = XBEE_BUF_LENGTH;
+  uint8_t *msg_ptr = xbee_buf + 2;
   memcpy(msg_ptr, &gtime, sizeof(gtime));
   msg_ptr += sizeof(gtime);
   memcpy(msg_ptr, &bmp, sizeof(bmp));
@@ -145,6 +153,7 @@ void Altimeter::transmitXbee(){
   msg_ptr++;
   *msg_ptr = TX_END;
   xbeeSerial.write(xbee_buf, XBEE_BUF_LENGTH);
+  Serial.write(xbee_buf, XBEE_BUF_LENGTH);
 
 }
 

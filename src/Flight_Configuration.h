@@ -8,7 +8,7 @@ Date: 1-6-2017
 #ifndef FLIGHT_CONFIGURATION_H
 #define FLIGHT_CONFIGURATION_H
 
-//#define SITL    //togle this to turn on SITL testing
+//#define SITL_ON    //togle this to turn on SITL testing
 
 
 
@@ -28,11 +28,15 @@ Date: 1-6-2017
 
 /*settings for indicating sensors*/
 #define FSTART       0xAA
-#define FESENSE      0x01
-#define FISOSENSE    0x02
-#define FBNO         0x03
-#define FMMA         0x04
-#define FBMP         0x05
+enum {
+  FESENSE    =  0x01,
+  FISOSENSE  =  0x02,
+  FBNO       =  0x03,
+  FMMA       =  0x04,
+  FBMP       =  0x05,
+  FGPS       =  0x06,
+};
+
 
 
 /*tone settings for the buzzer */
@@ -104,7 +108,9 @@ enum loggers {LOG_BMP, LOG_MMA, LOG_BNO, LOG_EVENT, LOG_GPS};
 #define xbeeSerial Serial3
 #define TX_START  0x40
 #define TX_END    0xB0
-const uint8_t XBEE_BUF_LENGTH = 1 + sizeof(long) + sizeof(Bmp_Data)
+
+// message is start byte + size + data + parity byte + end byte
+const uint8_t XBEE_BUF_LENGTH = 1 + 1 + sizeof(long) + sizeof(Bmp_Data)
                               + sizeof(Mma_Data) + sizeof(Bno_Data)
                               + sizeof(Gps_Data) + 1 + 1;
 

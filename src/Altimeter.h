@@ -26,7 +26,7 @@ public:
   /* member objects */
   Altitude_Filter alt_filter;
   Flight_Data flight_data;
-  #ifdef SITL
+  #ifdef SITL_ON
     SITL flight_sensors;
   #else
     Flight_Sensors flight_sensors;
@@ -53,7 +53,7 @@ private:
   void buzzInidicate(bool buzz);
   void buzzOff();
   void transmitXbee();
-
+  uint8_t temp_counter = 0;
   uint8_t xbee_buf[XBEE_BUF_LENGTH];
 
 
