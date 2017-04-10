@@ -1,5 +1,6 @@
 
 #include "Altimeter.h"
+#include <stdio.h>
 
 /* global object */
 Altimeter  altimeter;
@@ -20,4 +21,5 @@ int main(void)
     altimeter.manageEvents();
   }
 
+  return 0;
 }

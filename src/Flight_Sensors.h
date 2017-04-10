@@ -16,13 +16,12 @@
 #include <MMA65XX_Sensor.h>
 #include "Salt_Rev0.h"
 #include "Flight_Configuration.h"
-#include "Gps_Sensor.h"
 
 class Flight_Sensors {
  public:
   Flight_Sensors();
   bool initialize();
-  void update();
+  bool update();
 
   byte readESense();
   byte readIsoSense();
@@ -37,7 +36,7 @@ private:
   Adafruit_BMP280 bmp2;
   Adafruit_BNO055 bno;
   MMA65XX_Sensor mma;
-  Gps_Sensor gps;
+  QuickGPS gps;
 };
 
 

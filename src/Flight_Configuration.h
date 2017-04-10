@@ -7,12 +7,10 @@ Date: 1-6-2017
 #ifndef FLIGHT_CONFIGURATION_H
 #define FLIGHT_CONFIGURATION_H
 
-//#define SITL_ON    //togle this to turn on SITL testing
-
 #include <stdint.h>
 #include <QuickGPS.h>
 
-//#define SITL    //togle this to turn on SITL testing
+//#define SITL_ON    //togle this to turn on SITL testing
 
 
 /* Frequency settings. Values are in Hz */

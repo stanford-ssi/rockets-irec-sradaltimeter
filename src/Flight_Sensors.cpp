@@ -40,8 +40,8 @@ bool Flight_Sensors::initialize(){
   return sucessful;
 }
 
-void Flight_Sensors::update() {
-  gps.update();
+bool Flight_Sensors::update() {
+  return gps.update();
 }
 
 byte Flight_Sensors::readESense(){
@@ -84,7 +84,7 @@ Mma_Data Flight_Sensors::readMMA() {
 }
 
 Gps_Data Flight_Sensors::readGPS() {
-    gps.readPosition();
+  return gps.readPosition();
 }
 
 float Flight_Sensors::readVbat(){
