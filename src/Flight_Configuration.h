@@ -1,6 +1,5 @@
 /*
 This file contains flight configuration information for the IREC SRAD altimeter.
-
 Author: John Dean
 Date: 1-6-2017
 */
@@ -10,7 +9,10 @@ Date: 1-6-2017
 
 //#define SITL_ON    //togle this to turn on SITL testing
 
+#include <stdint.h>
+#include <QuickGPS.h>
 
+//#define SITL    //togle this to turn on SITL testing
 
 
 /* Frequency settings. Values are in Hz */
@@ -74,12 +76,7 @@ enum {
 
 
 // some structures for handeling data
-typedef struct{
-  float lon;
-  float lat;
-  float alt;
-  bool lock;
-} Gps_Data;
+typedef QuickGPS::Data Gps_Data;
 
 typedef struct{
   float pressure1;
