@@ -7,7 +7,6 @@ Date: 1-6-2017
 #ifndef FLIGHT_CONFIGURATION_H
 #define FLIGHT_CONFIGURATION_H
 
-#include <stdint.h>
 #include <QuickGPS.h>
 
 //#define SITL    //togle this to turn on SITL testing
