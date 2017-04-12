@@ -43,7 +43,7 @@ while(1):
     if byte == RX_START:
         length = xbee.read(1)
         message = xbee.read(struct.unpack('B', length)[0] - 2)
-        print(message)
+        #print(message)
 
         time = struct.unpack('L', message[0:4])[0] * 10^(-6)
         pressure1 = struct.unpack('f', message[4:8])[0]
@@ -56,4 +56,5 @@ while(1):
         bno_y = struct.unpack('f', message[24:28])[0]
         bno_z = struct.unpack('f', message[28:32])[0]
 
+        
         print(time,pressure1,pressure2,mma_x,mma_y,bno_x,bno_y,bno_z)

@@ -97,13 +97,27 @@ void Altimeter::startup(){
   differently depending on the vehicle state.
 */
 void Altimeter::mainUpdate(){
-  flight_sensors.update();
+  //flight_sensors.update();
   logger.log();
   manageLEDs();
-  temp_counter++;
-  if(temp_counter == 100){
-    temp_counter = 0;
-    transmitXbee();
+  //temp_counter++;
+  //if(temp_counter == 100){
+  //  temp_counter = 0;
+  transmitXbee();
+  //}
+  /*
+  Gps_Data g = flight_data.getGPSdata();
+  Serial.print(g.lon);
+  Serial.print(",");
+  Serial.print(g.lat);
+  Serial.print(",");
+  Serial.print(g.alt);
+  Serial.print(",");
+  Serial.println(g.lock);
+  */
+  Serial.println(freeRam());
+  while(Serial2.available()){
+    Serial.print(Serial2.read());
   }
   switch(flight_state){
     case IDLE:
@@ -221,4 +235,14 @@ void Altimeter::buzzInidicate(bool buzz){
 */
 void Altimeter::buzzOff(){
   analogWrite(BUZZER,256);
+}
+
+
+/******* Utilities ************/
+
+int Altimeter::freeRam()
+{
+  extern int __heap_start, *__brkval;
+  int v;
+  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }

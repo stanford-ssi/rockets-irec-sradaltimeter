@@ -50,13 +50,13 @@ void Flight_Events::updateClk(void){
   bno_precounter++;
   if(bno_precounter == UPDATE_CLK_FREQ_HZ/BNO_FREQ){
     bno_precounter = 0;
-    //events |= EVENT_READ_BNO;
+    events |= EVENT_READ_BNO;
   }
 
   gps_precounter++;
   if(gps_precounter == UPDATE_CLK_FREQ_HZ/GPS_FREQ){
     gps_precounter = 0;
-    //events |= EVENT_READ_GPS;
+    events |= EVENT_READ_GPS;
   }
 
   buzzer_precounter++;

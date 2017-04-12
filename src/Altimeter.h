@@ -56,6 +56,7 @@ private:
   uint8_t temp_counter = 0;
   uint8_t xbee_buf[XBEE_BUF_LENGTH];
 
+  int freeRam();
 
 };
 

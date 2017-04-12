@@ -19,7 +19,7 @@ Date: 1-6-2017
 #define BNO_FREQ            50
 #define BMP_FREQ            50
 #define MMA_FREQ            50
-#define GPS_FREQ            20
+#define GPS_FREQ            1
 #define BUZZER_FREQ         20
 #define FILTER_FREQ         50
 #define BEEP_FREQ_HZ        4        //frequency that the buzzer will beep at
@@ -75,7 +75,15 @@ enum {
 
 // some structures for handeling data
 typedef QuickGPS::Data Gps_Data;
-
+/*
+typedef struct{
+  uint64_t time;
+  float lon;
+  float lat;
+  float alt;
+  bool lock;
+} Gps_Data;
+*/
 typedef struct{
   float pressure1;
   float pressure2;
@@ -95,6 +103,8 @@ typedef struct{
 typedef struct{
   long event;
 } Event_Data;
+
+
 
 enum loggers {LOG_BMP, LOG_MMA, LOG_BNO, LOG_EVENT, LOG_GPS};
 
