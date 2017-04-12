@@ -45,7 +45,7 @@ enum {
 #define BUZZ_TONE_LOW       3000
 
 //GPS serial port
-#define GPS_SERIAL Serial2
+#define GPS_SERIAL Serial1
 
 
 //enumeration of flight states

@@ -38,13 +38,13 @@ void Flight_Events::updateClk(void){
   bmp_precounter++;
   if(bmp_precounter == UPDATE_CLK_FREQ_HZ/BMP_FREQ){
     bmp_precounter = 0;
-    //events |= EVENT_READ_BMP;
+    events |= EVENT_READ_BMP;
   }
 
   mma_precounter++;
   if(mma_precounter == UPDATE_CLK_FREQ_HZ/MMA_FREQ){
     mma_precounter = 0;
-    //events |= EVENT_READ_MMA;
+    events |= EVENT_READ_MMA;
   }
 
   bno_precounter++;

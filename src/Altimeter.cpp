@@ -99,13 +99,14 @@ void Altimeter::startup(){
 void Altimeter::mainUpdate(){
   //flight_sensors.update();
   logger.log();
+  //flight_sensors.update();
   manageLEDs();
   //temp_counter++;
   //if(temp_counter == 100){
   //  temp_counter = 0;
   transmitXbee();
   //}
-  /*
+
   Gps_Data g = flight_data.getGPSdata();
   Serial.print(g.lon);
   Serial.print(",");
@@ -114,11 +115,13 @@ void Altimeter::mainUpdate(){
   Serial.print(g.alt);
   Serial.print(",");
   Serial.println(g.lock);
-  */
-  Serial.println(freeRam());
-  while(Serial2.available()){
-    Serial.print(Serial2.read());
+  if(g.alt){
+    buzzInidicate(true);
+  } else {
+    buzzOff();
   }
+
+
   switch(flight_state){
     case IDLE:
       break;
@@ -161,14 +164,14 @@ void Altimeter::transmitXbee(){
   memcpy(msg_ptr, &gps, sizeof(gps));
   msg_ptr += sizeof(gps);
   uint8_t checksum = 0;
-  for(int i = 0; i < XBEE_BUF_LENGTH; i++){
+  for(int i = 0; i < XBEE_BUF_LENGTH-2; i++){
     checksum = xbee_buf[i] ^ checksum;
   }
   *msg_ptr = checksum;
   msg_ptr++;
   *msg_ptr = TX_END;
   xbeeSerial.write(xbee_buf, XBEE_BUF_LENGTH);
-  Serial.write(xbee_buf, XBEE_BUF_LENGTH);
+  //Serial.write(xbee_buf, XBEE_BUF_LENGTH);
 
 }
 
@@ -239,10 +242,3 @@ void Altimeter::buzzOff(){
 
 
 /******* Utilities ************/
-
-int Altimeter::freeRam()
-{
-  extern int __heap_start, *__brkval;
-  int v;
-  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
-}
