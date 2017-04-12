@@ -28,5 +28,10 @@ def get_q(v_x, v_y, h):
 rho = get_rho(h)
 q = get_q(v_x, v_y, h)
 
+n = 0
+for q_i in q[1:len(q)]:
+    plt.scatter(n, q_i)
+    n += 1
+
 
 print('q: {}\nrho: {}'.format(q, rho))
