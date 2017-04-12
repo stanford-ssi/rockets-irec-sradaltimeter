@@ -45,10 +45,12 @@ while(1):
         message = xbee.read(struct.unpack('B', length)[0] - 2)
         #print(message)
 
+        # static pressure in Pa 
         time = struct.unpack('L', message[0:4])[0] * 10^(-6)
-        pressure1 = struct.unpack('f', message[4:8])[0]
-        pressure2 = struct.unpack('f', message[8:12])[0]
+        pressure1 = struct.unpack('f', message[4:8])[0]   
+        pressure2 = struct.unpack('f', message[8:12])[0]  
         
+        # acceleration in Gs
         mma_x = struct.unpack('f', message[12:16])[0]
         mma_y = struct.unpack('f', message[16:20])[0]
 
