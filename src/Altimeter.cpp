@@ -101,6 +101,7 @@ void Altimeter::startup(){
   logger.init_variable(LOG_BMP, "bmp", sizeof(Bmp_Data));
   logger.init_variable(LOG_MMA, "mma", sizeof(Mma_Data));
   logger.init_variable(LOG_BNO, "bno", sizeof(Bno_Data));
+  logger.init_variable(LOG_GPS, "gps", sizeof(Gps_Data));
   logger.init_variable(LOG_EVENT, "event", sizeof(Event_Data));
   logger.finish_headers();
   flight_events.initialize();
@@ -138,8 +139,10 @@ void Altimeter::mainUpdate(){
   Serial.println(g.lock);
   */
   if(g.lock){
+    digitalWrite(LED_1, true);
     //buzzInidicate(true);
   } else {
+    digitalWrite(LED_1, false);
     buzzOff();
   }
 

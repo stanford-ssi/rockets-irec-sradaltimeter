@@ -37,7 +37,7 @@ while True:
         break
     if count == 0: break
     nb += 1
-
+    print(i)
     if i == 0:
         version, of = get_string(t, i+2)
         if count != 510 or version != ":skeleton:":
