@@ -45,28 +45,35 @@ while(1):
             length = xbee.read(1)
             message = xbee.read(struct.unpack('B', length)[0] - 2)
             full_message = byte + length + message
-
-            # static pressure in Pa 
-            time = struct.unpack('L', message[0:4])[0]
-            pressure1 = struct.unpack('f', message[4:8])[0]   
-            pressure2 = struct.unpack('f', message[8:12])[0]  
-            
-            # acceleration in Gs
-            mma_x = struct.unpack('f', message[12:16])[0]
-            mma_y = struct.unpack('f', message[16:20])[0]
-
-            bno_x = struct.unpack('f', message[20:24])[0]
-            bno_y = struct.unpack('f', message[24:28])[0]
-            bno_z = struct.unpack('f', message[28:32])[0]
-
-            c = 0
-            for b in full_message[0:(len(full_message)-2)]:
-                    c = c ^ b
-            checkpassed = c == full_message[len(full_message)-2]
-            data = [time, (pressure1 + pressure2)/2, mma_x, mma_y, checkpassed]
-            print("{: >20} {: >20} {: >20} {: >20} {: >10}".format(*data))
     except:
         print("Error reading stream")
+    try:
+    # static pressure in Pa 
+        time = struct.unpack('L', message[0:4])[0]
+        pressure1 = struct.unpack('f', message[4:8])[0]   
+        pressure2 = struct.unpack('f', message[8:12])[0]  
+        
+        # acceleration in Gs
+        mma_x = struct.unpack('f', message[12:16])[0]
+        mma_y = struct.unpack('f', message[16:20])[0]
+
+        bno_x = struct.unpack('f', message[20:24])[0]
+        bno_y = struct.unpack('f', message[24:28])[0]
+        bno_z = struct.unpack('f', message[28:32])[0]
+
+        time_g = struct.unpack('Q',message[32:40])[0]
+        lat = struct.unpack('f',message[40:44])[0]
+        lon = struct.unpack('f',message[44:48])[0]
+        alt = struct.unpack('f',message[48:52])[0]
+
+        c = 0
+        for b in full_message[0:(len(full_message)-2)]:
+                c = c ^ b
+        checkpassed = c == full_message[len(full_message)-2]
+        data = [time, round((pressure1 + pressure2)/2,0), round(mma_x,4), round(mma_y,4), lat, lon, alt, time_g, checkpassed]
+        print("{: >10} {: <10} {: >10} {: >10} {: >20} {: >20} {: >20} {: >20} {: >10}".format(*data))
+    except:
+        print("Error Parsing")
 
 
 

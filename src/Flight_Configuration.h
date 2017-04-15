@@ -10,7 +10,8 @@ Date: 1-6-2017
 #include <stdint.h>
 #include <QuickGPS.h>
 
-//#define SITL_ON    //togle this to turn on SITL testing
+//#define SITL_ON    //toggle this to turn on SITL testing
+#define _DEBUG_    //toggle this to put into debug mode
 
 
 /* Frequency settings. Values are in Hz */

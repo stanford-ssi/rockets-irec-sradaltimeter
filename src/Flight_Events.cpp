@@ -10,7 +10,7 @@ volatile uint16_t Flight_Events::mma_precounter = 0;
 volatile uint16_t Flight_Events::gps_precounter = 0;
 volatile uint16_t Flight_Events::buzzer_precounter = 0;
 volatile uint16_t Flight_Events::filter_precounter = 0;
-bool Flight_Events::processor_busy = 0;
+uint8_t Flight_Events::processor_busy = 0;
 
 void Flight_Events::initialize(){
   update_clk_timer.begin(this->updateClk, 1000000 / UPDATE_CLK_FREQ_HZ);
@@ -26,7 +26,8 @@ bool Flight_Events::check(uint8_t EVENT){
 
 void Flight_Events::updateClk(void){
   if(processor_busy){
-    Serial.println("WARNING: Loop took more than 5ms to execute");
+    Serial.print("Loop Collision, CODE: ");
+    Serial.println(processor_busy);
   }
 
   main_precounter++;

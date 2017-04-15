@@ -29,7 +29,10 @@ with open("20170411 IREC Avionics Skyline Radio Test.log", "rb") as f:
             bno_x = struct.unpack('f', message[20:24])[0]
             bno_y = struct.unpack('f', message[24:28])[0]
             bno_z = struct.unpack('f', message[28:32])[0]
-            #print(time,pressure1,pressure2,mma_x,mma_y,bno_x,bno_y,bno_z)
+            time = struct.unpack('Q',message[32:40])[0]
+            lat = struct.unpack('Q',message[40:44])[0]
+            lon = struct.unpack('Q',message[44:48])[0]
+            alt = struct.unpack('Q',message[48:52])[0]
             c = 0
             for b in message[0:(len(message)-2)]:
                 c = c ^ b

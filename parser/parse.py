@@ -4,7 +4,7 @@ import numpy as np
 
 def get_string(buf, idx):
     i = 0
-    s = ""
+    s = []
     while True:
         c = struct.unpack_from('c', buf, idx+i)[0]
         if c == '\x00':
@@ -13,7 +13,7 @@ def get_string(buf, idx):
         i += 1
     return s, i+1
 
-f = open("data48.bin", "rb")
+f = open("data04.bin", "rb")
 
 t = f.read()
 
@@ -28,9 +28,12 @@ i = 0
 nb = 0
 ne = 0
 while True:
+    print("in loop")
     try:
         count = struct.unpack_from('H', t, i)[0]
+        print(count)
     except:
+        print("failed")
         break
     if count == 0: break
     nb += 1

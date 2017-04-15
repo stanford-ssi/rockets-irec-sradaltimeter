@@ -9,40 +9,58 @@
 */
 void Altimeter::manageEvents(){
   if(flight_events.check(EVENT_MAIN)){
-    flight_events.processor_busy = true;
+    flight_events.processor_busy = EVENT_MAIN;
+    #ifdef _DEBUG_
+      Serial.println(flight_events.processor_busy);
+    #endif
     mainUpdate();
   }
   if(flight_events.check(EVENT_READ_BMP)){
-    flight_events.processor_busy = true;
+    flight_events.processor_busy = EVENT_READ_BMP;
+    #ifdef _DEBUG_
+      Serial.println(flight_events.processor_busy);
+    #endif
     Bmp_Data bmp_data = flight_sensors.readBMP();
     flight_data.updateBMP(bmp_data);
     logger.log_variable(LOG_BMP, &bmp_data);
   }
 
   if(flight_events.check(EVENT_READ_MMA)){
-    flight_events.processor_busy = true;
+    flight_events.processor_busy = EVENT_READ_MMA;
+    #ifdef _DEBUG_
+      Serial.println(flight_events.processor_busy);
+    #endif
     Mma_Data mma_data = flight_sensors.readMMA();
     flight_data.updateMMA(mma_data);
     logger.log_variable(LOG_MMA, &mma_data);
   }
 
   if(flight_events.check(EVENT_READ_GPS)){
-    flight_events.processor_busy = true;
+    flight_events.processor_busy = EVENT_READ_GPS;
+    #ifdef _DEBUG_
+      Serial.println(flight_events.processor_busy);
+    #endif
     Gps_Data gps_data = flight_sensors.readGPS();
     flight_data.updateGPS(gps_data);
     logger.log_variable(LOG_GPS, &gps_data);
   }
 
   if(flight_events.check(EVENT_BUZZER)){
-    flight_events.processor_busy = true;
+    flight_events.processor_busy = EVENT_BUZZER;
+    #ifdef _DEBUG_
+      Serial.println(flight_events.processor_busy);
+    #endif
     //manageBuzzer();
   }
 
   if(flight_events.check(EVENT_FILTER)){
-    flight_events.processor_busy = true;
+    flight_events.processor_busy = EVENT_FILTER;
+    #ifdef _DEBUG_
+      Serial.print(flight_events.processor_busy);
+    #endif
     alt_filter.update(flight_data.getBMPdata(), flight_data.getBNOdata(), flight_data.getMMAdata());
   }
-  flight_events.processor_busy = false;
+  flight_events.processor_busy = 0;
 }
 
 /*
@@ -97,17 +115,20 @@ void Altimeter::startup(){
   differently depending on the vehicle state.
 */
 void Altimeter::mainUpdate(){
-  //flight_sensors.update();
+  flight_sensors.update();
   logger.log();
   //flight_sensors.update();
   manageLEDs();
-  //temp_counter++;
-  //if(temp_counter == 100){
-  //  temp_counter = 0;
-  transmitXbee();
-  //}
+
+  temp_counter++;
+  if(temp_counter == 10){
+    temp_counter = 0;
+    transmitXbee();
+  }
+
 
   Gps_Data g = flight_data.getGPSdata();
+  /*
   Serial.print(g.lon);
   Serial.print(",");
   Serial.print(g.lat);
@@ -115,8 +136,9 @@ void Altimeter::mainUpdate(){
   Serial.print(g.alt);
   Serial.print(",");
   Serial.println(g.lock);
-  if(g.alt){
-    buzzInidicate(true);
+  */
+  if(g.lock){
+    //buzzInidicate(true);
   } else {
     buzzOff();
   }
