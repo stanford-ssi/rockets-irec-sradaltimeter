@@ -1,28 +1,32 @@
 import sys
 import struct
 import numpy as np
+import array
+import matplotlib.pyplot as plt
 
 def get_string(buf, idx):
     i = 0
-    s = []
+    s = ""
     while True:
         c = struct.unpack_from('c', buf, idx+i)[0]
-        if c == '\x00':
+        print(c)
+        if c == b'\x00':
             break
-        s += c
+        s += c.decode("utf-8")
         i += 1
+    print(s)
     return s, i+1
 
-f = open("data04.bin", "rb")
+f = open("data10.bin", "rb")
 
 t = f.read()
 
 sizes = {}
 names = {}
 
-unpacks = {'event': lambda x: struct.unpack('I', x)[0], 'mma': lambda x: struct.unpack('ff', x)}
-data = {'event': [], 'mma': []}
-dts = {'event': [], 'mma': []}
+unpacks = {'event': lambda x: struct.unpack('I', x)[0], 'mma': lambda x: struct.unpack('ff', x), 'bmp': lambda x: struct.unpack('ff', x), 'bno': lambda x: struct.unpack('fff', x),'gps' : lambda x: struct.unpack('fffQ', x)}
+data = {'event': [], 'mma': [], 'bmp' : [], 'bno' : [], 'gps' : []}
+dts = {'event': [], 'mma': [], 'bmp' : [], 'bno' : [],'gps' : []}
 
 i = 0
 nb = 0
@@ -31,13 +35,11 @@ while True:
     print("in loop")
     try:
         count = struct.unpack_from('H', t, i)[0]
-        print(count)
     except:
         print("failed")
         break
     if count == 0: break
     nb += 1
-    print(i)
     if i == 0:
         version, of = get_string(t, i+2)
         if count != 510 or version != ":skeleton:":
@@ -79,3 +81,11 @@ print("Average times")
 for k in dts:
     v = np.array(dts[k])*1e-6
     print(k, 1/np.diff(v).mean())
+
+mma_x = []
+print(data['mma'])
+for a in data['mma']:
+    mma_x.append(a[1])
+
+plt.plot(mma_x)
+plt.show()
