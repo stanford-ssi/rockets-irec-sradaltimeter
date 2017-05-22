@@ -43,7 +43,7 @@ def run(data):
 
     return line,
 
-ani = animation.FuncAnimation(fig, run, data_gen, blit=False, interval=10,
+ani = animation.FuncAnimation(fig, run, data_gen, blit=False, interval=.1,
                               repeat=False, init_func=init)
 plt.show()
 
@@ -65,51 +65,6 @@ for i in arange(1,10):
 
 print ('FPS: ',200/(time.time()-tstart))
 
-# %% example three 
-# http://scipy-cookbook.readthedocs.io/items/Matplotlib_Animations.html
-# uses gtk (which i can't seem to find for python 3 rn)
-
-import sys
-import gtk, gobject
-import pylab as p
-import matplotlib.numerix as nx
-import time
-
-ax = p.subplot(111)
-canvas = ax.figure.canvas
-
-# for profiling
-tstart = time.time()
-
-# create the initial line
-x = nx.arange(0,2*nx.pi,0.01)
-line, = p.plot(x, nx.sin(x), animated=True)
-
-# save the clean slate background -- everything but the animated line
-# is drawn and saved in the pixel buffer background
-background = canvas.copy_from_bbox(ax.bbox)
-
-def update_line(*args):
-    # restore the clean slate background
-    canvas.restore_region(background)
-    # update the data
-    line.set_ydata(nx.sin(x+update_line.cnt/10.0))
-    # just draw the animated artist
-    ax.draw_artist(line)
-    # just redraw the axes rectangle
-    canvas.blit(ax.bbox)
-
-    if update_line.cnt==50:
-        # print the timing info and quit
-        print('FPS: ' , update_line.cnt/(time.time()-tstart))
-        sys.exit()
-
-    update_line.cnt += 1
-    return True
-update_line.cnt = 0
-
-gobject.idle_add(update_line)
-p.show()
 
 # %% https://jakevdp.github.io/blog/2012/08/18/matplotlib-animation-tutorial/
 

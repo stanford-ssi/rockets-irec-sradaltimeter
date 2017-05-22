@@ -2,7 +2,7 @@ import sys
 import glob
 import serial
 import struct
-import numpy
+import numpy as np
 import csv
 
 RX_START = b'\x40'

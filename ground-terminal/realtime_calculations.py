@@ -2,7 +2,6 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 
 # fake data 
 v_x = np.array([2, 3, 5, 10])    # m/s
