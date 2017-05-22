@@ -26,7 +26,7 @@ public:
   that is is possible to pass the pointer to them to the interrupt
   timer object */
   static void updateClk(void);
-  static bool processor_busy;
+  static uint8_t processor_busy;
 
 private:
   IntervalTimer update_clk_timer;
