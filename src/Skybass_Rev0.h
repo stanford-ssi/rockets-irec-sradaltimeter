@@ -5,12 +5,10 @@ Author: John Dean
 Date: 1-6-2017
 */
 
-#ifndef SALT_REV0_H
-#define SALT_REV0_H
+#ifndef SKYBASS_H
+#define SKYBASS_H
 
 /* Pins */
-
-
 #define LED_1         29
 #define LED_2         30
 #define LED_3         31
@@ -44,9 +42,14 @@ Date: 1-6-2017
 
 #define VSENSE        A10
 
+/* serial ports */
+#define xbeeSerial Serial3
+#define GPS_SERIAL Serial1
+
+
 /* Values */
 
 #define VBAT_RATIO    (10.0/15.0)
-
+#define BUZER_OFF     256
 
 #endif

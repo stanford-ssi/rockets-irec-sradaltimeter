@@ -11,7 +11,6 @@ Date: 1-6-2017
 #define FLIGHT_DATA_H
 
 #include <WProgram.h>
-#include "Salt_Rev0.h"
 #include "Flight_Configuration.h"
 
 const uint16_t DEFAULT_ARRAY_LENGTH  = 10;

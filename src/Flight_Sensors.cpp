@@ -4,18 +4,19 @@ Date: 1-6-2017
 */
 
 #include "Flight_Sensors.h"
+#include <math.h>
 
 
 /*Sensors*/
 Flight_Sensors::Flight_Sensors()
   : bmp1(Adafruit_BMP280(BMP1_CS)),
     bmp2(Adafruit_BMP280(BMP2_CS)),
-    bno(Adafruit_BNO055(BNO_ADR)),
+    bno(Adafruit_BNO055(55)),
     mma(MMA65XX_Sensor(MMA_CS)),
     gps(&GPS_SERIAL) {}
 
 bool Flight_Sensors::initialize(){
-  bool sucessful = true;
+  bool sucessful = 0;
 
   pinMode(ESENSE_1, INPUT);
   pinMode(ESENSE_2, INPUT);
@@ -31,13 +32,20 @@ bool Flight_Sensors::initialize(){
 
   pinMode(VSENSE, INPUT);
   analogReadResolution(12);
-
-  sucessful &= bmp1.begin();
-  sucessful &= bmp2.begin();
-  sucessful &= mma.begin();
-  sucessful &= gps.begin();
-
-  return sucessful;
+  sucessful |= bmp1.begin()<<1;
+  sucessful |= bmp2.begin()<<2;
+  sucessful |= mma.begin()<<3;
+  sucessful |= gps.begin()<<4;
+  sucessful |= bno.begin()<<5;
+  if(sucessful&&(0b11111)) return true;
+  else {
+    if(~sucessful&(1<<1)) Serial.println("bmp1 init error");
+    if(~sucessful&(1<<2)) Serial.println("bmp2 init error");
+    if(~sucessful&(1<<3)) Serial.println("mma init error");
+    if(~sucessful&(1<<4)) Serial.println("gps init error");
+    if(~sucessful&(1<<5)) Serial.println("bno init error");
+    return false;
+  }
 }
 
 bool Flight_Sensors::update() {
@@ -62,6 +70,38 @@ byte Flight_Sensors::readIsoSense(){
   if(digitalReadFast(ISO_SENSE_22)){iso_sense_array|=(1<<3);}
   if(digitalReadFast(ISO_SENSE_23)){iso_sense_array|=(1<<2);}
   return iso_sense_array;
+}
+
+Bno_Data Flight_Sensors::readBNO(){
+  //elapsedMicros timer = 0;
+  Bno_Data bno_data;
+  //imu::Vector<3> vec;
+  //vec = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
+  //bno_data.lin_a.x = vec[0];
+  //bno_data.lin_a.y = vec[1];
+  //bno_data.lin_a.z = vec[2];
+  //Serial.print("1: ");
+  //Serial.println(timer);
+  //vec = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+  //Serial.print("2: ");
+  //Serial.println(timer);
+  //bno_data.gyro.x = vec[0];
+  //bno_data.gyro.y = vec[1];
+  //bno_data.gyro.z = vec[2];
+  //vec = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+  //bno_data.rot_a.x = vec[0];
+  //bno_data.rot_a.y = vec[1];
+  //bno_data.rot_a.z = vec[2];
+  //Serial.print("3: ");
+  //Serial.println(timer);
+  imu::Quaternion quat = bno.getQuat();
+  bno_data.quat.w = quat.w();
+  bno_data.quat.x = quat.x();
+  bno_data.quat.y = quat.y();
+  bno_data.quat.z = quat.z();
+  //Serial.print("4: ");
+  //Serial.println(timer);
+  return bno_data;
 }
 
 Bmp_Data Flight_Sensors::readBMP(){
@@ -89,6 +129,6 @@ Gps_Data Flight_Sensors::readGPS() {
 
 float Flight_Sensors::readVbat(){
   int read = analogRead(VSENSE);
-  float vbat = ((float)read)/1023.0 * 3.3 / (VBAT_RATIO);
+  float vbat = ((float)read)/4095.0 * 3.3 / (VBAT_RATIO);
   return vbat;
 }

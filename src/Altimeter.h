@@ -11,7 +11,6 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 #include <Adafruit_BMP280.h>
-#include "Salt_Rev0.h"
 #include "Flight_Sensors.h"
 #include "Flight_Data.h"
 #include "Flight_Events.h"
@@ -40,7 +39,7 @@ public:
   uint8_t led_counter = 0;          //counter used to blink the led
   uint8_t buzzer_counter;           //counter used to buzz the buzzer
   uint8_t buzzer_freq_scaler;       //counter used to act as a scaler on the buzzer frequency
-
+  
   void manageEvents();
   void startup();
 

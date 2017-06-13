@@ -62,8 +62,10 @@ void Flight_Events::updateClk(void){
 
   buzzer_precounter++;
   if(buzzer_precounter == UPDATE_CLK_FREQ_HZ/BUZZER_FREQ){
-    gps_precounter = 0;
-    //events |= EVENT_BUZZER;
+    buzzer_precounter = 0;
+    #ifdef _BUZZER_
+      events |= EVENT_BUZZER;
+    #endif
   }
 
   filter_precounter++;

@@ -14,7 +14,6 @@
 #include <Adafruit_BMP280.h>
 #include <ADC.h>
 #include <MMA65XX_Sensor.h>
-#include "Salt_Rev0.h"
 #include "Flight_Configuration.h"
 
 class Flight_Sensors {
@@ -28,10 +27,11 @@ class Flight_Sensors {
   Mma_Data readMMA();
   Bmp_Data readBMP();
   Gps_Data readGPS();
+  Bno_Data readBNO();
   float readVbat();
 
 private:
-
+  
   Adafruit_BMP280 bmp1;
   Adafruit_BMP280 bmp2;
   Adafruit_BNO055 bno;

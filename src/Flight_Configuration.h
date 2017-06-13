@@ -10,8 +10,10 @@ Date: 1-6-2017
 #include <stdint.h>
 #include <QuickGPS.h>
 
+#include "Skybass_Rev1.h" // change for which rev the board is
 //#define SITL_ON    //toggle this to turn on SITL testing
 //#define _DEBUG_    //toggle this to put into debug mode
+//#define _BUZZER_   //toggle this to enable buzzer
 
 
 /* Frequency settings. Values are in Hz */
@@ -38,15 +40,12 @@ enum {
   FGPS       =  0x06,
 };
 
-
-
 /*tone settings for the buzzer */
 #define BUZZ_TONE_HIGH      5000
-#define BUZZ_TONE_MID       4000
+#define BUZZ_TONE_MID       4500
 #define BUZZ_TONE_LOW       3000
 
-//GPS serial port
-#define GPS_SERIAL Serial1
+
 
 
 //enumeration of flight states
@@ -64,13 +63,13 @@ enum {
 
 //enumeration of flight events
 enum {
-  EVENT_MAIN     =  0b00000001,
-  EVENT_READ_BNO =  0b00000010,
-  EVENT_READ_MMA =  0b00000100,
-  EVENT_READ_BMP =  0b00001000,
-  EVENT_READ_GPS =  0b00010000,
-  EVENT_BUZZER   =  0b00100000,
-  EVENT_FILTER   =  0b01000000,
+  EVENT_MAIN     =  0b00000001, //1
+  EVENT_READ_BNO =  0b00000010, //2
+  EVENT_READ_MMA =  0b00000100, //4
+  EVENT_READ_BMP =  0b00001000, //8
+  EVENT_READ_GPS =  0b00010000, //16
+  EVENT_BUZZER   =  0b00100000, //32
+  EVENT_FILTER   =  0b01000000, //64
 };
 
 
@@ -87,7 +86,9 @@ typedef struct{
 */
 typedef struct{
   float pressure1;
+  float temp1;
   float pressure2;
+  float temp2;
 } Bmp_Data;
 
 typedef struct{
@@ -96,9 +97,27 @@ typedef struct{
 } Mma_Data;
 
 typedef struct{
-  float x;
-  float y;
-  float z;
+  struct{
+    float x;
+    float y;
+    float z;
+  } lin_a;
+  struct{
+    float w;
+    float x;
+    float y;
+    float z;
+  } quat;
+  struct{
+    float x;
+    float y;
+    float z;
+  } gyro;
+  struct{
+    float x;
+    float y;
+    float z;
+  } rot_a;
 } Bno_Data;
 
 typedef struct{
@@ -111,7 +130,7 @@ enum loggers {LOG_BMP, LOG_MMA, LOG_BNO, LOG_EVENT, LOG_GPS};
 
 
 //xbee communication
-#define xbeeSerial Serial3
+
 #define TX_START  0x40
 #define TX_END    0xB0
 

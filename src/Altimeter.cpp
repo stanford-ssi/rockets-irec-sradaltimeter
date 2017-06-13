@@ -3,6 +3,7 @@
 #include "Logger.h"
 
 
+
 /*
   This is the only function that runs in the while(1) loop in main.cpp. It simply
   checks the events and executes them
@@ -15,6 +16,16 @@ void Altimeter::manageEvents(){
     #endif
     mainUpdate();
   }
+
+  if(flight_events.check(EVENT_READ_BNO)){
+    flight_events.processor_busy = EVENT_READ_BNO;
+    #ifdef _DEBUG_
+      Serial.println(flight_events.processor_busy);
+    #endif
+    Bno_Data bno_data = flight_sensors.readBNO();
+    flight_data.updateBNO(bno_data);
+  }
+
   if(flight_events.check(EVENT_READ_BMP)){
     flight_events.processor_busy = EVENT_READ_BMP;
     #ifdef _DEBUG_
@@ -31,7 +42,6 @@ void Altimeter::manageEvents(){
       Serial.println(flight_events.processor_busy);
     #endif
     Mma_Data mma_data = flight_sensors.readMMA();
-    flight_data.updateMMA(mma_data);
     logger.log_variable(LOG_MMA, &mma_data);
   }
 
@@ -50,7 +60,7 @@ void Altimeter::manageEvents(){
     #ifdef _DEBUG_
       Serial.println(flight_events.processor_busy);
     #endif
-    //manageBuzzer();
+    manageBuzzer();
   }
 
   if(flight_events.check(EVENT_FILTER)){
@@ -69,8 +79,8 @@ void Altimeter::manageEvents(){
 */
 void Altimeter::startup(){
   pinMode(BUZZER, OUTPUT);
-  analogWriteFrequency(BUZZER, BUZZ_TONE_MID);
-  analogWrite(BUZZER, 128);
+  buzzOff();
+  //buzzInidicate(false);
   Serial.begin(115200);   //usb Serial
   xbeeSerial.begin(115200);  //xbee Serial
   pinMode(LED_1, OUTPUT);
@@ -81,15 +91,20 @@ void Altimeter::startup(){
   digitalWrite(LED_2, true);
   digitalWrite(LED_3, true);
   digitalWrite(LED_4, true);
-  delay(1000);
-  /* gpio */
+  delay(500);
+  buzzOff();
 
+  /* gpio */
   pinMode(TRIG_1, OUTPUT);
   pinMode(TRIG_2, OUTPUT);
   pinMode(TRIG_3, OUTPUT);
   pinMode(TRIG_4, OUTPUT);
   flight_data.initialize();
-  flight_sensors.initialize();
+  if(flight_sensors.initialize()){
+    Serial.println("Sensors initialized successfully");
+  } else {
+    Serial.println("Sensors not initialized successfully");
+  }
 
   /* Pessimistic approximation of the number of bytes:
    * (100 Hz)*(5 sensors)*(16 byte/sensor)*(3 hour) = 86400000 bytes.
@@ -107,8 +122,12 @@ void Altimeter::startup(){
   flight_events.initialize();
 
   xbeeSerial.println("Unit Initialized");
-  //Serial.println("Unit Initialized");
+  Serial.println("Unit Initialized");
+  //buzzInidicate(true);
+  delay(100);
   buzzOff();
+
+  flight_state = IDLE;
 }
 
 /*
@@ -118,7 +137,6 @@ void Altimeter::startup(){
 void Altimeter::mainUpdate(){
   flight_sensors.update();
   logger.log();
-  //flight_sensors.update();
   manageLEDs();
 
   temp_counter++;
@@ -126,29 +144,15 @@ void Altimeter::mainUpdate(){
     temp_counter = 0;
     transmitXbee();
   }
-
-
   Gps_Data g = flight_data.getGPSdata();
-  /*
-  Serial.print(g.lon);
-  Serial.print(",");
-  Serial.print(g.lat);
-  Serial.print(",");
-  Serial.print(g.alt);
-  Serial.print(",");
-  Serial.println(g.lock);
-  */
   if(g.lock){
     digitalWrite(LED_1, true);
-    //buzzInidicate(true);
   } else {
     digitalWrite(LED_1, false);
-    buzzOff();
   }
-
-
   switch(flight_state){
     case IDLE:
+
       break;
     case ARMED:
       break;
@@ -169,12 +173,14 @@ void Altimeter::mainUpdate(){
 
 
 void Altimeter::transmitXbee(){
-
+  elapsedMicros timer;
   long gtime = flight_data.getGlobaltime();
   Bmp_Data bmp = flight_data.getBMPdata();
   Mma_Data mma = flight_data.getMMAdata();
   Bno_Data bno = flight_data.getBNOdata();
   Gps_Data gps = flight_data.getGPSdata();
+  float vbat = flight_sensors.readVbat();
+  int time1 = timer;
   xbee_buf[0] = TX_START;
   xbee_buf[1] = XBEE_BUF_LENGTH;
   uint8_t *msg_ptr = xbee_buf + 2;
@@ -188,16 +194,20 @@ void Altimeter::transmitXbee(){
   msg_ptr += sizeof(bno);
   memcpy(msg_ptr, &gps, sizeof(gps));
   msg_ptr += sizeof(gps);
+  memcpy(msg_ptr, &vbat, sizeof(vbat));
+  msg_ptr += sizeof(vbat);
   uint8_t checksum = 0;
+  int time2 = timer;
   for(int i = 0; i < XBEE_BUF_LENGTH-2; i++){
     checksum = xbee_buf[i] ^ checksum;
   }
   *msg_ptr = checksum;
   msg_ptr++;
   *msg_ptr = TX_END;
+  int time3 = timer;
   xbeeSerial.write(xbee_buf, XBEE_BUF_LENGTH);
-  //Serial.write(xbee_buf, XBEE_BUF_LENGTH);
-
+  int time4 = timer;
+  Serial.printf("[%d,%d,%d,%d,%d]",XBEE_BUF_LENGTH,time1,time2,time3,time4);
 }
 
 /*
@@ -233,15 +243,19 @@ void Altimeter::manageBuzzer(){
     case 6:
       buzzInidicate(flight_data.getESense()&(1<<4));
       break;
+    case 10:
+      buzzInidicate(flight_data.getGPSdata().lock);
+      break;
     default:
       buzzOff();
       break;
     }
     buzzer_counter++;
-    if(buzzer_counter > 30){buzzer_counter = 0;}
+    if(buzzer_counter > 100)buzzer_counter = 0;
   }
   buzzer_freq_scaler++;
   if(buzzer_freq_scaler >= BUZZER_FREQ/BEEP_FREQ_HZ){buzzer_freq_scaler = 0;}
+
 }
 
 /*
@@ -262,7 +276,7 @@ void Altimeter::buzzInidicate(bool buzz){
   own function cause I like the name.
 */
 void Altimeter::buzzOff(){
-  analogWrite(BUZZER,256);
+  analogWrite(BUZZER,BUZZER_OFF);
 }
 
 

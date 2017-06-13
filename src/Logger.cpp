@@ -1,9 +1,7 @@
 #include "Logger.h"
 #include "SdFat.h"
 #include "string.h"
-
 #include "Flight_Configuration.h"
-#include "Salt_Rev0.h"
 
 /* Adapted from SdFat's LowLatencyLogger. */
 
