@@ -72,7 +72,9 @@ while(1):
             for b in full_message[0:(len(full_message)-2)]:
                 c = c ^ b
             checkpassed = c == full_message[len(full_message)-2]
-            data = [time, round(altitude,6), round(pressure1), round(pressure2), round(mma_x,4), round(mma_y,4), lat, lon, alt, time_g, lock, checkpassed]
+            data = [time, round(altitude,6), round(pressure1), round(pressure2), 
+                    round(mma_x,4), round(mma_y,4), lat, lon, alt, time_g, lock, 
+                    checkpassed]
             f.write(str(data))
             f.write("\n")
             f.close()
