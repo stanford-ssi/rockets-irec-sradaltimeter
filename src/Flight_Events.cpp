@@ -1,6 +1,9 @@
 
 #include "Flight_Events.h"
+#include "Altimeter.h"
+#include "Flight_Configuration.h"
 
+extern Altimeter altimeter;
 
 volatile uint8_t Flight_Events::events = 0b00000000; //need to declare the static variable
 volatile uint16_t Flight_Events::main_precounter = 0;
@@ -26,9 +29,12 @@ bool Flight_Events::check(uint8_t EVENT){
 
 void Flight_Events::updateClk(void){
   if(processor_busy){
-    Serial.print("Loop Collision, CODE: ");
+    Serial.print("LC:");
     Serial.println(processor_busy);
   }
+
+  /* stuff that always should run*/
+  altimeter.transmitXbee();
 
   main_precounter++;
   if(main_precounter == UPDATE_CLK_FREQ_HZ/MAIN_FREQ){

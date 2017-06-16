@@ -27,7 +27,7 @@ Date: 1-6-2017
 #define FILTER_FREQ         50
 #define BEEP_FREQ_HZ        4        //frequency that the buzzer will beep at
 
-/*  */
+/*setting for history buffers*/
 
 /*settings for indicating sensors*/
 #define FSTART       0xAA
@@ -62,7 +62,8 @@ enum {
 };
 
 //enumeration of flight events
-enum {
+#define NUM_EVENTS 7
+typedef enum {
   EVENT_MAIN     =  0b00000001, //1
   EVENT_READ_BNO =  0b00000010, //2
   EVENT_READ_MMA =  0b00000100, //4
@@ -70,7 +71,9 @@ enum {
   EVENT_READ_GPS =  0b00010000, //16
   EVENT_BUZZER   =  0b00100000, //32
   EVENT_FILTER   =  0b01000000, //64
-};
+} event_t;
+
+
 
 
 // some structures for handeling data
@@ -108,6 +111,11 @@ typedef struct{
     float y;
     float z;
   } quat;
+  struct{
+    float x;
+    float y;
+    float z;
+  } euler;
   struct{
     float x;
     float y;

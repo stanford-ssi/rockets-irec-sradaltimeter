@@ -75,7 +75,7 @@ byte Flight_Sensors::readIsoSense(){
 Bno_Data Flight_Sensors::readBNO(){
   //elapsedMicros timer = 0;
   Bno_Data bno_data;
-  //imu::Vector<3> vec;
+  imu::Vector<3> vec;
   //vec = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
   //bno_data.lin_a.x = vec[0];
   //bno_data.lin_a.y = vec[1];
@@ -94,6 +94,10 @@ Bno_Data Flight_Sensors::readBNO(){
   //bno_data.rot_a.z = vec[2];
   //Serial.print("3: ");
   //Serial.println(timer);
+  vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+  bno_data.euler.x = vec[0];
+  bno_data.euler.y = vec[1];
+  bno_data.euler.z = vec[2];
   imu::Quaternion quat = bno.getQuat();
   bno_data.quat.w = quat.w();
   bno_data.quat.x = quat.x();

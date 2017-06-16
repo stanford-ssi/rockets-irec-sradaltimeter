@@ -39,25 +39,25 @@ public:
   uint8_t led_counter = 0;          //counter used to blink the led
   uint8_t buzzer_counter;           //counter used to buzz the buzzer
   uint8_t buzzer_freq_scaler;       //counter used to act as a scaler on the buzzer frequency
-  
+
   void manageEvents();
   void startup();
+  void transmitXbee();
 
 
 private:
+  void eventHandle(event_t event);
   void mainUpdate();
   void manageBuzzer();
   void manageLEDs();
   void logData();
   void buzzInidicate(bool buzz);
   void buzzOff();
-  void transmitXbee();
+  bool setXbeeBuffer();
   uint8_t temp_counter = 0;
   uint8_t xbee_buf[XBEE_BUF_LENGTH];
-
-
+  uint8_t xbee_buf_head;
 };
-
 
 
 #endif

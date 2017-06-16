@@ -1,76 +1,69 @@
 #include <SPI.h>
 #include "Altimeter.h"
 #include "Logger.h"
-
-
+#include "Flight_Configuration.h"
 
 /*
   This is the only function that runs in the while(1) loop in main.cpp. It simply
   checks the events and executes them
 */
 void Altimeter::manageEvents(){
-  if(flight_events.check(EVENT_MAIN)){
-    flight_events.processor_busy = EVENT_MAIN;
-    #ifdef _DEBUG_
-      Serial.println(flight_events.processor_busy);
-    #endif
-    mainUpdate();
+  #ifdef _DEBUG_
+    elapsedMicros timer;
+  #endif
+  for(int i = 0; i < NUM_EVENTS; i++){
+    event_t event = (event_t)(1<<i);
+    if(flight_events.check(event)){
+      flight_events.processor_busy = event;
+      #ifdef _DEBUG_
+        Serial.printf("%d,",flight_events.processor_busy);
+        timer = 0;
+      #endif
+      eventHandle(event);
+      #ifdef _DEBUG_
+        Serial.println(timer);
+      #endif
+    }
   }
+  flight_events.processor_busy = 0;
+}
 
-  if(flight_events.check(EVENT_READ_BNO)){
-    flight_events.processor_busy = EVENT_READ_BNO;
-    #ifdef _DEBUG_
-      Serial.println(flight_events.processor_busy);
-    #endif
+void Altimeter::eventHandle(event_t event){
+  if(event == EVENT_MAIN){
+    mainUpdate();
+    return;
+  }
+  if(event == EVENT_READ_BNO){
     Bno_Data bno_data = flight_sensors.readBNO();
     flight_data.updateBNO(bno_data);
+    return;
   }
-
-  if(flight_events.check(EVENT_READ_BMP)){
-    flight_events.processor_busy = EVENT_READ_BMP;
-    #ifdef _DEBUG_
-      Serial.println(flight_events.processor_busy);
-    #endif
+  if(event == EVENT_READ_BMP){
     Bmp_Data bmp_data = flight_sensors.readBMP();
     flight_data.updateBMP(bmp_data);
     logger.log_variable(LOG_BMP, &bmp_data);
+    return;
   }
-
-  if(flight_events.check(EVENT_READ_MMA)){
-    flight_events.processor_busy = EVENT_READ_MMA;
-    #ifdef _DEBUG_
-      Serial.println(flight_events.processor_busy);
-    #endif
+  if(event == EVENT_READ_MMA){
     Mma_Data mma_data = flight_sensors.readMMA();
+    flight_data.updateMMA(mma_data);
     logger.log_variable(LOG_MMA, &mma_data);
+    return;
   }
-
-  if(flight_events.check(EVENT_READ_GPS)){
-    flight_events.processor_busy = EVENT_READ_GPS;
-    #ifdef _DEBUG_
-      Serial.println(flight_events.processor_busy);
-    #endif
+  if(event == EVENT_READ_GPS){
     Gps_Data gps_data = flight_sensors.readGPS();
     flight_data.updateGPS(gps_data);
     logger.log_variable(LOG_GPS, &gps_data);
+    return;
   }
-
-  if(flight_events.check(EVENT_BUZZER)){
-    flight_events.processor_busy = EVENT_BUZZER;
-    #ifdef _DEBUG_
-      Serial.println(flight_events.processor_busy);
-    #endif
+  if(event == EVENT_BUZZER){
     manageBuzzer();
+    return;
   }
-
-  if(flight_events.check(EVENT_FILTER)){
-    flight_events.processor_busy = EVENT_FILTER;
-    #ifdef _DEBUG_
-      Serial.print(flight_events.processor_busy);
-    #endif
+  if(event == EVENT_FILTER){
     alt_filter.update(flight_data.getBMPdata(), flight_data.getBNOdata(), flight_data.getMMAdata());
+    return;
   }
-  flight_events.processor_busy = 0;
 }
 
 /*
@@ -138,12 +131,20 @@ void Altimeter::mainUpdate(){
   flight_sensors.update();
   logger.log();
   manageLEDs();
-
   temp_counter++;
   if(temp_counter == 10){
     temp_counter = 0;
-    transmitXbee();
+    setXbeeBuffer();
   }
+  Bno_Data bno = flight_data.getBNOdata();
+  //Serial.print("w: ");
+  //Serial.print(bno.quat.w);
+  Serial.print(", x: ");
+  Serial.print(bno.euler.x);
+  Serial.print(", y: ");
+  Serial.print(bno.euler.y);
+  Serial.print(", z: ");
+  Serial.println(bno.euler.z);
   Gps_Data g = flight_data.getGPSdata();
   if(g.lock){
     digitalWrite(LED_1, true);
@@ -172,7 +173,10 @@ void Altimeter::mainUpdate(){
 }
 
 
-void Altimeter::transmitXbee(){
+bool Altimeter::setXbeeBuffer(){
+  if(xbee_buf_head != XBEE_BUF_LENGTH){
+    return false;
+  }
   elapsedMicros timer;
   long gtime = flight_data.getGlobaltime();
   Bmp_Data bmp = flight_data.getBMPdata();
@@ -205,9 +209,18 @@ void Altimeter::transmitXbee(){
   msg_ptr++;
   *msg_ptr = TX_END;
   int time3 = timer;
-  xbeeSerial.write(xbee_buf, XBEE_BUF_LENGTH);
-  int time4 = timer;
-  Serial.printf("[%d,%d,%d,%d,%d]",XBEE_BUF_LENGTH,time1,time2,time3,time4);
+  xbee_buf_head = 0;
+}
+
+void Altimeter::transmitXbee(){
+  int avail = xbeeSerial.availableForWrite();
+  for(int i = 0; i < avail; i++){
+    if(xbee_buf_head == XBEE_BUF_LENGTH){
+      break;
+    }
+    xbeeSerial.write(xbee_buf[xbee_buf_head]);
+    xbee_buf_head++;
+  }
 }
 
 /*
@@ -232,18 +245,15 @@ void Altimeter::manageBuzzer(){
   if(buzzer_freq_scaler == 0){
     switch(buzzer_counter){
     case 0:
-      buzzInidicate(flight_data.getESense()&(1<<7));
+      buzzInidicate(false);
       break;
     case 2:
-      buzzInidicate(flight_data.getESense()&(1<<6));
-      break;
-    case 4:
-      buzzInidicate(flight_data.getESense()&(1<<5));
+      buzzInidicate(false);
       break;
     case 6:
-      buzzInidicate(flight_data.getESense()&(1<<4));
+      buzzInidicate(flight_state == ARMED);
       break;
-    case 10:
+    case 8:
       buzzInidicate(flight_data.getGPSdata().lock);
       break;
     default:

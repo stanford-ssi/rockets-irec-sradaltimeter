@@ -50,24 +50,40 @@ while(1):
             full_message = byte + length + message
             #try:
                 # static pressure in Pa 
-            time = struct.unpack('L', message[0:4])[0]
-            pressure1 = struct.unpack('f', message[4:8])[0]   
-            pressure2 = struct.unpack('f', message[8:12])[0] 
+            ind = 0
+            time = struct.unpack('L', message[ind:(ind+4)])[0]
+            ind += 4
+            pressure1 = struct.unpack('f', message[ind:(ind+4)])[0] 
+            ind += 4
+            pressure2 = struct.unpack('f', message[ind:(ind+4)])[0] 
+            ind += 4
             altitude = (1-(((pressure1 + pressure2)/2)/101350)**0.190284) * 145366.45
             
             # acceleration in Gs
-            mma_x = struct.unpack('f', message[12:16])[0]
-            mma_y = struct.unpack('f', message[16:20])[0]
+            mma_x = struct.unpack('f', message[ind:(ind+4)])[0]
+            ind += 4
+            mma_y = struct.unpack('f', message[ind:(ind+4)])[0]
+            ind += 4
 
-            bno_x = struct.unpack('f', message[20:24])[0]
-            bno_y = struct.unpack('f', message[24:28])[0]
-            bno_z = struct.unpack('f', message[28:32])[0]
+            bno_x = struct.unpack('f', message[ind:(ind+4)])[0]
+            ind += 4
+            bno_y = struct.unpack('f', message[ind:(ind+4)])[0]
+            ind += 4
+            bno_z = struct.unpack('f', message[ind:(ind+4)])[0]
+            ind += 4
 
-            time_g = struct.unpack('Q',message[32:40])[0]
-            lat = struct.unpack('f',message[40:44])[0]
-            lon = struct.unpack('f',message[44:48])[0]
-            alt = struct.unpack('f',message[48:52])[0]
-            lock = struct.unpack('?',message[52:53])[0]
+            ind += 10 * 4
+
+            time_g = struct.unpack('Q',message[ind:(ind+8)])[0]
+            ind += 8
+            lat = struct.unpack('f',message[ind:(ind+4)])[0]
+            ind += 4
+            lon = struct.unpack('f',message[ind:(ind+4)])[0]
+            ind += 4
+            alt = struct.unpack('f',message[ind:(ind+4)])[0]
+            ind += 4
+            lock = struct.unpack('?',message[ind:(ind+1)])[0]
+            ind += 1
             c = 0
             for b in full_message[0:(len(full_message)-2)]:
                 c = c ^ b

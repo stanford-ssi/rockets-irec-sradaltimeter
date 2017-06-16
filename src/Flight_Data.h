@@ -13,8 +13,8 @@ Date: 1-6-2017
 #include <WProgram.h>
 #include "Flight_Configuration.h"
 
-const uint16_t DEFAULT_ARRAY_LENGTH  = 10;
-const uint16_t DEFAULT_STORE_FREQ    = 1;
+const uint16_t DEFAULT_ARRAY_LENGTH  = 50;
+const uint16_t DEFAULT_STORE_FREQ    = 10;
 
 #define BLOCK_COUNT 256000
 
