@@ -2,6 +2,7 @@
 #include "Altimeter.h"
 #include "Logger.h"
 #include "Flight_Configuration.h"
+#include "Flight_Data.h"
 
 /*
   This is the only function that runs in the while(1) loop in main.cpp. It simply
@@ -136,15 +137,15 @@ void Altimeter::mainUpdate(){
     temp_counter = 0;
     setXbeeBuffer();
   }
-  Bno_Data bno = flight_data.getBNOdata();
-  //Serial.print("w: ");
-  //Serial.print(bno.quat.w);
+
+  /*Bno_Data bno = flight_data.getBNOdata();
   Serial.print(", x: ");
   Serial.print(bno.euler.x);
   Serial.print(", y: ");
   Serial.print(bno.euler.y);
   Serial.print(", z: ");
   Serial.println(bno.euler.z);
+  */
   Gps_Data g = flight_data.getGPSdata();
   if(g.lock){
     digitalWrite(LED_1, true);
@@ -153,9 +154,12 @@ void Altimeter::mainUpdate(){
   }
   switch(flight_state){
     case IDLE:
-
+      if(checkOnRail()){
+        flight_state = ARMED;
+      }
       break;
     case ARMED:
+      if(!checkOnRail())flight_state = IDLE;
       break;
     case PWRD_FLGHT:
       break;
@@ -288,6 +292,16 @@ void Altimeter::buzzInidicate(bool buzz){
 void Altimeter::buzzOff(){
   analogWrite(BUZZER,BUZZER_OFF);
 }
+
+/***** Transition checking functions ******/
+
+bool Altimeter::checkOnRail(){
+  Bno_Data data[DEFAULT_ARRAY_LENGTH];
+  flight_data.bno_array.getFullArray(data,(int)DEFAULT_ARRAY_LENGTH);
+  return false;
+}
+
+
 
 
 /******* Utilities ************/

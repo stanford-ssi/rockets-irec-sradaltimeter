@@ -28,6 +28,9 @@ Date: 1-6-2017
 #define BEEP_FREQ_HZ        4        //frequency that the buzzer will beep at
 
 /*setting for history buffers*/
+#define DEFAULT_ARRAY_LENGTH    50
+#define DEFAULT_STORE_FREQ      10
+
 
 /*settings for indicating sensors*/
 #define FSTART       0xAA

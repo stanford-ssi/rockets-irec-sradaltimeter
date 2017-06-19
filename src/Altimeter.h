@@ -18,6 +18,7 @@
 #include "Flight_Configuration.h"
 #include "Logger.h"
 #include "Altitude_Filter.h"
+#include "Average.h"
 
 
 class Altimeter{
@@ -54,6 +55,10 @@ private:
   void buzzInidicate(bool buzz);
   void buzzOff();
   bool setXbeeBuffer();
+
+  //flight transitions
+  bool checkOnRail();
+
   uint8_t temp_counter = 0;
   uint8_t xbee_buf[XBEE_BUF_LENGTH];
   uint8_t xbee_buf_head;

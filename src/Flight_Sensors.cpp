@@ -73,25 +73,25 @@ byte Flight_Sensors::readIsoSense(){
 }
 
 Bno_Data Flight_Sensors::readBNO(){
-  //elapsedMicros timer = 0;
+  elapsedMicros timer = 0;
   Bno_Data bno_data;
   imu::Vector<3> vec;
-  //vec = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
-  //bno_data.lin_a.x = vec[0];
-  //bno_data.lin_a.y = vec[1];
-  //bno_data.lin_a.z = vec[2];
+  vec = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
+  bno_data.lin_a.x = vec[0];
+  bno_data.lin_a.y = vec[1];
+  bno_data.lin_a.z = vec[2];
   //Serial.print("1: ");
   //Serial.println(timer);
-  //vec = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+  vec = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
   //Serial.print("2: ");
   //Serial.println(timer);
-  //bno_data.gyro.x = vec[0];
-  //bno_data.gyro.y = vec[1];
-  //bno_data.gyro.z = vec[2];
-  //vec = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
-  //bno_data.rot_a.x = vec[0];
-  //bno_data.rot_a.y = vec[1];
-  //bno_data.rot_a.z = vec[2];
+  bno_data.gyro.x = vec[0];
+  bno_data.gyro.y = vec[1];
+  bno_data.gyro.z = vec[2];
+  vec = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+  bno_data.rot_a.x = vec[0];
+  bno_data.rot_a.y = vec[1];
+  bno_data.rot_a.z = vec[2];
   //Serial.print("3: ");
   //Serial.println(timer);
   vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
@@ -103,8 +103,8 @@ Bno_Data Flight_Sensors::readBNO(){
   bno_data.quat.x = quat.x();
   bno_data.quat.y = quat.y();
   bno_data.quat.z = quat.z();
-  //Serial.print("4: ");
-  //Serial.println(timer);
+  Serial.println(timer);
+
   return bno_data;
 }
 

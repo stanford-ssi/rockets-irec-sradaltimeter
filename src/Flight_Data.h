@@ -13,8 +13,7 @@ Date: 1-6-2017
 #include <WProgram.h>
 #include "Flight_Configuration.h"
 
-const uint16_t DEFAULT_ARRAY_LENGTH  = 50;
-const uint16_t DEFAULT_STORE_FREQ    = 10;
+
 
 #define BLOCK_COUNT 256000
 
@@ -42,7 +41,7 @@ public:
   };
   void push(t_type data);
   t_type getLast();
-  t_type* getFullArray();
+  bool getFullArray(t_type* full_array, int len);
   t_type getOld(uint32_t get_time);
 
 private:
@@ -56,6 +55,61 @@ private:
   void checkHead();
   t_type* data_array;
 };
+
+/* ------- TEMPLATE CLASS DEFINITIONS ------- */
+
+/*
+This function gets returns the value from a given number of milliseconds ago
+Need to add a check to make sure that the given time isn't too long ago
+*/
+template<class t_type> t_type Circular_Array<t_type>::getOld(uint32_t get_time){
+   int16_t ind = static_cast<float>(sample_freq) * get_time / store_prescale / 1000;
+   ind = head - ind;
+   if(ind < 0) ind += array_length;
+   return data_array[ind];
+}
+
+/*
+Pushes a neew value to the array.
+*/
+template<class t_type> void Circular_Array<t_type>::push(t_type data){
+  /*Serial.print("Write Count: ");
+  Serial.print(write_count);
+  if(write_count == 0) Serial.print(millis());
+  Serial.print("  Head: ");
+  Serial.println(head); */
+  write_count++;
+  if(write_count >= store_prescale){
+    write_count = 0;
+    head++;
+    checkHead();
+  }
+  data_array[head] = data;
+}
+
+template<class t_type> t_type Circular_Array<t_type>::getLast(){
+  return data_array[head];
+}
+
+template<class t_type> bool Circular_Array<t_type>::getFullArray(t_type* full_array, int len){
+  for(int i = 0; i <= head; i++){
+    if(i == len) return false;
+    full_array[i] = data_array[head-i];
+  }
+  for(int i = head+1; i < array_length; i++){
+    if(i == len) return false;
+    full_array[i] = data_array[(array_length+head)-i];
+  }
+  return true;
+}
+
+template<class t_type> void Circular_Array<t_type>::checkHead(){
+  if(head >= array_length){
+    head = 0;
+  }
+}
+
+/* ----- FLIGHT DATA CLASS ----- */
 
 class Flight_Data {
 public:
@@ -82,6 +136,13 @@ public:
   Gps_Data getGPSdata();
   long getGlobaltime();
 
+  Circular_Array<Bmp_Data> bmp_array;
+  Circular_Array<Mma_Data> mma_array;
+  Circular_Array<Bno_Data> bno_array;
+  Circular_Array<Gps_Data> gps_array;
+  Circular_Array<byte> esense_array;
+  Circular_Array<byte> isosense_array;
+
 private:
 
   elapsedMicros global_time;
@@ -92,15 +153,9 @@ private:
   byte iso_sense;
   byte esense;
 
-  Circular_Array<Bmp_Data> bmp_array;
-  Circular_Array<Mma_Data> mma_array;
-  Circular_Array<Bno_Data> bno_array;
-  Circular_Array<Gps_Data> gps_array;
-  Circular_Array<byte> esense_array;
-  Circular_Array<byte> isosense_array;
-
-
 };
+
+
 
 
 
