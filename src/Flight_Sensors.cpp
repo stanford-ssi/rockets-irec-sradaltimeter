@@ -103,8 +103,7 @@ Bno_Data Flight_Sensors::readBNO(){
   bno_data.quat.x = quat.x();
   bno_data.quat.y = quat.y();
   bno_data.quat.z = quat.z();
-  Serial.println(timer);
-
+  //Serial.println(timer);
   return bno_data;
 }
 
@@ -113,17 +112,17 @@ Bmp_Data Flight_Sensors::readBMP(){
   Bmp_Data bmp_data;
   bmp_data.pressure1 = bmp1.readPressure();
   bmp_data.pressure2 = bmp2.readPressure();
+  bmp_data.temp1 = bmp1.readTemperature();
+  bmp_data.temp2 = bmp2.readTemperature();
   return bmp_data;
 }
 
 Mma_Data Flight_Sensors::readMMA() {
-
   Mma_Data ret;
   sensors_event_t evt;
   mma.getEvent(&evt);
   ret.x = evt.acceleration.x;
-  ret.y = evt.acceleration.y;
-
+  ret.y = -evt.acceleration.y;
   return ret;
 }
 

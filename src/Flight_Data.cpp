@@ -5,12 +5,14 @@ Date: 1-6-2017
 */
 
 #include "Flight_Data.h"
+#include "utils.h"
 
  /*Flight_Data::Flight_Data() {
 
  }*/
 
 bool Flight_Data::initialize(){
+  global_time = 0;
   bool success = true;
   return success;
 }
@@ -38,10 +40,6 @@ void Flight_Data::updateGPS(Gps_Data gps_data){
   gps_array.push(gps_data);
 }
 
-
-
-
-
 byte Flight_Data::getESense(){
   return this->esense;
 }
@@ -50,8 +48,8 @@ byte Flight_Data::getIsoSense(){
   return this->iso_sense;
 }
 
-long Flight_Data::getGlobaltime(){
-  return this->global_time;
+unsigned long Flight_Data::getGlobaltime(){
+  return (unsigned long)this->global_time;
 }
 
 Bmp_Data Flight_Data::getBMPdata(){
@@ -67,7 +65,11 @@ Gps_Data Flight_Data::getGPSdata(){
   return gps_array.getLast();
 }
 
-
+float Flight_Data::getBMPalt(){
+  Bmp_Data data = getBMPdata();
+  float p = (data.pressure1 + data.pressure2)/2;
+  return p2alt(p);
+}
 
 
 /* ----- Circular_Storage_Buffer ------ */

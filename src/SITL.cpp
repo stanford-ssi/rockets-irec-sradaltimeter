@@ -1,5 +1,6 @@
 #include "SITL.h"
 
+
 /*Sensors*/
 
 
@@ -18,82 +19,46 @@ bool SITL::initialize(){
 }
 
 byte SITL::readESense(){
-  request(FESENSE);
-  while(true){
-    if(Serial.available()){
-      byte read = Serial.read();
-      return read;
-    }
-  }
+  return 0;
 }
 
 byte SITL::readIsoSense(){
-  request(FISOSENSE);
-  while(true){
-    if(Serial.available()){
-      byte read = Serial.read();
-      return read;
-    }
-  }
+  return 0;
 }
 
 Bmp_Data SITL::readBMP(){
-  Bmp_Data bmp_data;
-  request(FBMP);
-  int data_len = sizeof(Bmp_Data);
-  while(true){
-    if(Serial.available() == data_len){
-      byte read[data_len];
-      for(int i = 0;i < 8;i++){
-        read[i]= Serial.read();
-      }
-      bmp_data.pressure1 = bytes2Float(read);
-      bmp_data.pressure2 = bytes2Float(read+4);
-      return bmp_data;
-    }
-  }
+  Bmp_Data bmp;
+  request(LOG_BMP);
+  getData(&bmp);
+  return bmp;
 }
 
 Mma_Data SITL::readMMA(){
-  Mma_Data mma_data;
-  request(FMMA);
-  int data_len = sizeof(Bmp_Data);
-  while(true){
-    if(Serial.available() == data_len){
-      byte read[data_len];
-      for(int i = 0;i < 8;i++){
-        read[i]= Serial.read();
-      }
-      mma_data.x = bytes2Float(read);
-      mma_data.y = bytes2Float(read+4);
-      return mma_data;
-    }
-  }
+  Mma_Data mma;
+  request(LOG_MMA);
+  getData(&mma);
+  return mma;
 }
 
 Gps_Data SITL::readGPS(){
-  Gps_Data data;
-  request(FGPS);
-  int data_len = sizeof(Gps_Data);
-  while(true){
-    if(Serial.available() == data_len){
-      byte read[data_len];
-      for(int i = 0;i < 8;i++){
-        read[i]= Serial.read();
-      }
-      data.lat = bytes2Float(read);
-      data.lon = bytes2Float(read+4);
-      data.alt = bytes2Float(read+8);
-      data.lock = read[12];
-      return data;
-    }
-  }
+  Gps_Data gps;
+  request(LOG_GPS);
+  getData(&gps);
+  return gps;
+}
+
+Bno_Data SITL::readBNO(){
+  Bno_Data bno;
+  request(LOG_BNO);
+  getData(&bno);
+  return bno;
 }
 
 
 float SITL::readVbat(){
-  int read = analogRead(VSENSE);
-  float vbat = ((float)read)/1023.0 * 3.3 / (VBAT_RATIO);
+  float vbat;
+  request(LOG_VBAT);
+  getData(&vbat);
   return vbat;
 }
 

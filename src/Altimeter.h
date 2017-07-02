@@ -58,10 +58,15 @@ private:
 
   //flight transitions
   bool checkOnRail();
+  bool checkLiftoff();
+  bool checkLowAlt();
 
-  uint8_t temp_counter = 0;
+  uint8_t transmit_counter = 0;
   uint8_t xbee_buf[XBEE_BUF_LENGTH];
   uint8_t xbee_buf_head;
+
+  //transitions variables
+  bool liftoff_accel = false;
 };
 
 

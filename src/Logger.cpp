@@ -101,7 +101,7 @@ void Logger::init_variable(uint8_t id, const char* name, uint8_t size) {
 
 }
 
-void Logger::log_variable(uint8_t id, void *obj) {
+void Logger::log_variable(uint8_t id, void *obj, unsigned long log_time) {
   uint8_t sz = varsz[id];
   if (blocks[to_insert].count + sz + 5 > 510) {
     memset(ptr(), 255, 510-blocks[to_insert].count);
@@ -113,7 +113,7 @@ void Logger::log_variable(uint8_t id, void *obj) {
   }
   *ptr() = id;
   inc(1);
-  *(uint32_t*)ptr() = long(timer)/10; // 10^-5 seconds
+  *(uint32_t*)ptr() = log_time; // 10^-6 seconds
   inc(4);
   memcpy(ptr(), obj, sz);
   inc(sz);

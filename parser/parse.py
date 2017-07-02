@@ -18,16 +18,22 @@ def get_string(buf, idx):
     print(s)
     return s, i+1
 
-f = open("FAR_2017-5-21.bin", "rb")
+f = open("data30.bin", "rb")
 
 t = f.read()
 
 sizes = {}
 names = {}
 
-unpacks = {'event': lambda x: struct.unpack('I', x)[0], 'mma': lambda x: struct.unpack('ff', x), 'bmp': lambda x: struct.unpack('ff', x), 'bno': lambda x: struct.unpack('fff', x),'gps' : lambda x: struct.unpack('?fffQ', x)}
-data = {'event': [], 'mma': [], 'bmp' : [], 'bno' : [], 'gps' : []}
-dts = {'event': [], 'mma': [], 'bmp' : [], 'bno' : [],'gps' : []}
+unpacks = {'event': lambda x: struct.unpack('I', x)[0],
+	'mma' : lambda x: struct.unpack('ff', x), 
+	'bmp' : lambda x: struct.unpack('ffff', x), 
+	'bno' : lambda x: struct.unpack('ffffffffffffffff', x),
+	'gps' : lambda x: struct.unpack('?fffQ', x),
+	'vbat': lambda x: struct.unpack('f', x)
+	}
+data = {'event': [], 'mma': [], 'bmp' : [], 'bno' : [], 'gps' : [], 'vbat' : []}
+dts = {'event': [], 'mma': [], 'bmp' : [], 'bno' : [],'gps' : [], 'vbat' : []}
 
 i = 0
 nb = 0

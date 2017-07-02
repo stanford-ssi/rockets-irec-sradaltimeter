@@ -3,6 +3,7 @@
 #include "Logger.h"
 #include "Flight_Configuration.h"
 #include "Flight_Data.h"
+#include "utils.h"
 
 /*
   This is the only function that runs in the while(1) loop in main.cpp. It simply
@@ -37,24 +38,25 @@ void Altimeter::eventHandle(event_t event){
   if(event == EVENT_READ_BNO){
     Bno_Data bno_data = flight_sensors.readBNO();
     flight_data.updateBNO(bno_data);
+    logger.log_variable(LOG_BNO, &bno_data, flight_data.getGlobaltime());
     return;
   }
   if(event == EVENT_READ_BMP){
     Bmp_Data bmp_data = flight_sensors.readBMP();
     flight_data.updateBMP(bmp_data);
-    logger.log_variable(LOG_BMP, &bmp_data);
+    logger.log_variable(LOG_BMP, &bmp_data, flight_data.getGlobaltime());
     return;
   }
   if(event == EVENT_READ_MMA){
     Mma_Data mma_data = flight_sensors.readMMA();
     flight_data.updateMMA(mma_data);
-    logger.log_variable(LOG_MMA, &mma_data);
+    logger.log_variable(LOG_MMA, &mma_data, flight_data.getGlobaltime());
     return;
   }
   if(event == EVENT_READ_GPS){
     Gps_Data gps_data = flight_sensors.readGPS();
     flight_data.updateGPS(gps_data);
-    logger.log_variable(LOG_GPS, &gps_data);
+    logger.log_variable(LOG_GPS, &gps_data, flight_data.getGlobaltime());
     return;
   }
   if(event == EVENT_BUZZER){
@@ -62,7 +64,7 @@ void Altimeter::eventHandle(event_t event){
     return;
   }
   if(event == EVENT_FILTER){
-    alt_filter.update(flight_data.getBMPdata(), flight_data.getBNOdata(), flight_data.getMMAdata());
+    //alt_filter.update(flight_data.getBMPdata(), flight_data.getBNOdata(), flight_data.getMMAdata());
     return;
   }
 }
@@ -74,7 +76,7 @@ void Altimeter::eventHandle(event_t event){
 void Altimeter::startup(){
   pinMode(BUZZER, OUTPUT);
   buzzOff();
-  //buzzInidicate(false);
+  buzzInidicate(false);
   Serial.begin(115200);   //usb Serial
   xbeeSerial.begin(115200);  //xbee Serial
   pinMode(LED_1, OUTPUT);
@@ -112,12 +114,12 @@ void Altimeter::startup(){
   logger.init_variable(LOG_BNO, "bno", sizeof(Bno_Data));
   logger.init_variable(LOG_GPS, "gps", sizeof(Gps_Data));
   logger.init_variable(LOG_EVENT, "event", sizeof(Event_Data));
+  logger.init_variable(LOG_VBAT, "vbat", sizeof(float));
   logger.finish_headers();
   flight_events.initialize();
-
   xbeeSerial.println("Unit Initialized");
   Serial.println("Unit Initialized");
-  //buzzInidicate(true);
+  buzzInidicate(true);
   delay(100);
   buzzOff();
 
@@ -130,15 +132,20 @@ void Altimeter::startup(){
 */
 void Altimeter::mainUpdate(){
   flight_sensors.update();
+  float vbat = flight_sensors.readVbat();
+  logger.log_variable(LOG_VBAT, &vbat, flight_data.getGlobaltime());
   logger.log();
   manageLEDs();
-  temp_counter++;
-  if(temp_counter == 10){
-    temp_counter = 0;
+
+
+  transmit_counter++;
+  if((transmit_counter == 10)||(flight_state == ARMED)||(flight_state == PWRD_FLGHT)){
+    transmit_counter = 0;
     setXbeeBuffer();
   }
 
-  /*Bno_Data bno = flight_data.getBNOdata();
+  /*
+  Bno_Data bno = flight_data.getBNOdata();
   Serial.print(", x: ");
   Serial.print(bno.euler.x);
   Serial.print(", y: ");
@@ -146,22 +153,28 @@ void Altimeter::mainUpdate(){
   Serial.print(", z: ");
   Serial.println(bno.euler.z);
   */
+
   Gps_Data g = flight_data.getGPSdata();
-  if(g.lock){
-    digitalWrite(LED_1, true);
-  } else {
-    digitalWrite(LED_1, false);
-  }
+  if(g.lock) digitalWrite(LED_2, true);
+  else digitalWrite(LED_2, false);
+
+  if(flight_state == ARMED) digitalWrite(LED_1, true);
+  else digitalWrite(LED_1, false);
+
+
   switch(flight_state){
     case IDLE:
       if(checkOnRail()){
         flight_state = ARMED;
+        flight_data.launchpad_alt = flight_data.getBMPalt();
       }
       break;
     case ARMED:
       if(!checkOnRail())flight_state = IDLE;
+      //if(checkLiftoff())flight_state = PWRD_FLGHT;
       break;
     case PWRD_FLGHT:
+      //if(checkLowAlt())flight_state = RCVRED;
       break;
     case COAST:
       break;
@@ -181,14 +194,12 @@ bool Altimeter::setXbeeBuffer(){
   if(xbee_buf_head != XBEE_BUF_LENGTH){
     return false;
   }
-  elapsedMicros timer;
   long gtime = flight_data.getGlobaltime();
   Bmp_Data bmp = flight_data.getBMPdata();
   Mma_Data mma = flight_data.getMMAdata();
   Bno_Data bno = flight_data.getBNOdata();
   Gps_Data gps = flight_data.getGPSdata();
   float vbat = flight_sensors.readVbat();
-  int time1 = timer;
   xbee_buf[0] = TX_START;
   xbee_buf[1] = XBEE_BUF_LENGTH;
   uint8_t *msg_ptr = xbee_buf + 2;
@@ -204,15 +215,17 @@ bool Altimeter::setXbeeBuffer(){
   msg_ptr += sizeof(gps);
   memcpy(msg_ptr, &vbat, sizeof(vbat));
   msg_ptr += sizeof(vbat);
+  //for(int i = 2; i < XBEE_BUF_LENGTH-2; i++){
+  //  xbee_buf[i] = 0;
+  //}
   uint8_t checksum = 0;
-  int time2 = timer;
   for(int i = 0; i < XBEE_BUF_LENGTH-2; i++){
     checksum = xbee_buf[i] ^ checksum;
   }
   *msg_ptr = checksum;
+  //Serial.println(msg_ptr - xbee_buf);
   msg_ptr++;
   *msg_ptr = TX_END;
-  int time3 = timer;
   xbee_buf_head = 0;
 }
 
@@ -296,12 +309,50 @@ void Altimeter::buzzOff(){
 /***** Transition checking functions ******/
 
 bool Altimeter::checkOnRail(){
-  Bno_Data data[DEFAULT_ARRAY_LENGTH];
-  flight_data.bno_array.getFullArray(data,(int)DEFAULT_ARRAY_LENGTH);
+  int len = flight_data.bno_array.array_length;
+  Bno_Data data[len];
+  Average<float> y_angle(len);
+  flight_data.bno_array.getArray(data,(int)len);
+  for(int i = 0; i<len;i++){
+    y_angle.push(data[i].euler.y);
+  }
+  float std = y_angle.stddev();
+  float avg = y_angle.mean();
+  //Serial.print("std: ");
+  //Serial.print(std);
+  //Serial.print(", mean: ");
+  //Serial.println(avg);
+  if(flight_state == IDLE){
+    return ((std < LAUNCH_ANGLE_STD_MAX)&&(avg > LAUNCH_ANGLE_AVG_MIN));
+  }
+  if(flight_state == ARMED){
+    return (avg > LAUNCH_ANGLE_AVG_MIN);
+  }
   return false;
 }
 
+bool Altimeter::checkLiftoff(){
+  int len = flight_data.mma_array.store_freq; //this will get one second of the array
+  Mma_Data mma[len];
+  flight_data.mma_array.getArray(mma, len);
+  int dv = 0;
+  for(int i = 0; i<len;i++){
+    dv += i;
+  }
+  if(dv/len > LIFTOFF_DV_MIN) liftoff_accel = true;
+  return (liftoff_accel && ((flight_data.getBMPalt()-flight_data.launchpad_alt) > LIFTOFF_ALT_MIN));
+}
 
-
-
-/******* Utilities ************/
+bool Altimeter::checkLowAlt(){
+  int len = flight_data.bmp_array.array_length;
+  Bmp_Data data[len];
+  Average<float> alt(len);
+  flight_data.bmp_array.getArray(data,len);
+  for(int i = 0;i<len;i++){
+    float a = p2alt((data[i].pressure1 + data[i].pressure2)/2);
+    alt.push(a);
+  }
+  float avg_alt = alt.mean() - flight_data.launchpad_alt;
+  Serial.println(avg_alt);
+  return avg_alt < RECOVERY_MAX_ALT;
+}

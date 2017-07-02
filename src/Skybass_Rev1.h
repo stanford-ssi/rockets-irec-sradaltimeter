@@ -21,6 +21,7 @@ Date: 1-6-2017
 #define SD_CS         28
 #define MMA_CS        22
 #define BNO_ADR       0x26  //this isn't the actual address
+#define GPS_ENABLE
 
 #define ARM_MMA_X     21
 #define ARM_MMA_Y     20

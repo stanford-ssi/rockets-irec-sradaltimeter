@@ -13,7 +13,7 @@ class Logger{
    int initialize(int rough_bytes);
 
    void init_variable(uint8_t id, const char *name, uint8_t size);
-   void log_variable(uint8_t id, void *obj);
+   void log_variable(uint8_t id, void *obj, unsigned long log_time);
 
    void log();
 

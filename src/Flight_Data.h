@@ -41,14 +41,14 @@ public:
   };
   void push(t_type data);
   t_type getLast();
-  bool getFullArray(t_type* full_array, int len);
+  bool getArray(t_type* full_array, int len);
   t_type getOld(uint32_t get_time);
+  uint16_t array_length;
+  uint16_t store_freq;
 
 private:
   uint16_t sample_freq;
-  uint16_t store_freq;
   uint16_t store_prescale;
-  uint16_t array_length;
   uint16_t log_count;
   uint16_t head;
   uint16_t write_count;
@@ -91,7 +91,7 @@ template<class t_type> t_type Circular_Array<t_type>::getLast(){
   return data_array[head];
 }
 
-template<class t_type> bool Circular_Array<t_type>::getFullArray(t_type* full_array, int len){
+template<class t_type> bool Circular_Array<t_type>::getArray(t_type* full_array, int len){
   for(int i = 0; i <= head; i++){
     if(i == len) return false;
     full_array[i] = data_array[head-i];
@@ -134,7 +134,8 @@ public:
   Mma_Data getMMAdata();
   Bno_Data getBNOdata();
   Gps_Data getGPSdata();
-  long getGlobaltime();
+  unsigned long getGlobaltime();
+  float getBMPalt();
 
   Circular_Array<Bmp_Data> bmp_array;
   Circular_Array<Mma_Data> mma_array;
@@ -143,6 +144,7 @@ public:
   Circular_Array<byte> esense_array;
   Circular_Array<byte> isosense_array;
 
+  float launchpad_alt;
 private:
 
   elapsedMicros global_time;

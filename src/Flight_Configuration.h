@@ -13,11 +13,11 @@ Date: 1-6-2017
 #include "Skybass_Rev1.h" // change for which rev the board is
 //#define SITL_ON    //toggle this to turn on SITL testing
 //#define _DEBUG_    //toggle this to put into debug mode
-//#define _BUZZER_   //toggle this to enable buzzer
+#define _BUZZER_   //toggle this to enable buzzer
 
 
 /* Frequency settings. Values are in Hz */
-#define UPDATE_CLK_FREQ_HZ  200      //frequency of the update "clock"
+#define UPDATE_CLK_FREQ_HZ  100      //frequency of the update "clock"
 #define MAIN_FREQ           20      //frequency of the main update
 #define BNO_FREQ            50
 #define BMP_FREQ            50
@@ -31,17 +31,16 @@ Date: 1-6-2017
 #define DEFAULT_ARRAY_LENGTH    50
 #define DEFAULT_STORE_FREQ      10
 
+/* state transition values */
+#define LAUNCH_ANGLE_AVG_MIN 75
+#define LAUNCH_ANGLE_STD_MAX 1.0
+#define LIFTOFF_DV_MIN 50
+#define LIFTOFF_ALT_MIN 100
+#define RECOVERY_MAX_ALT 1000
 
 /*settings for indicating sensors*/
 #define FSTART       0xAA
-enum {
-  FESENSE    =  0x01,
-  FISOSENSE  =  0x02,
-  FBNO       =  0x03,
-  FMMA       =  0x04,
-  FBMP       =  0x05,
-  FGPS       =  0x06,
-};
+
 
 /*tone settings for the buzzer */
 #define BUZZ_TONE_HIGH      5000
@@ -68,12 +67,12 @@ enum {
 #define NUM_EVENTS 7
 typedef enum {
   EVENT_MAIN     =  0b00000001, //1
-  EVENT_READ_BNO =  0b00000010, //2
+  EVENT_FILTER   =  0b00000010, //2
   EVENT_READ_MMA =  0b00000100, //4
   EVENT_READ_BMP =  0b00001000, //8
   EVENT_READ_GPS =  0b00010000, //16
   EVENT_BUZZER   =  0b00100000, //32
-  EVENT_FILTER   =  0b01000000, //64
+  EVENT_READ_BNO =  0b01000000, //64
 } event_t;
 
 
@@ -137,7 +136,7 @@ typedef struct{
 
 
 
-enum loggers {LOG_BMP, LOG_MMA, LOG_BNO, LOG_EVENT, LOG_GPS};
+enum loggers {LOG_BMP, LOG_MMA, LOG_BNO, LOG_GPS, LOG_VBAT, LOG_EVENT};
 
 
 //xbee communication
@@ -148,7 +147,7 @@ enum loggers {LOG_BMP, LOG_MMA, LOG_BNO, LOG_EVENT, LOG_GPS};
 // message is start byte + size + data + parity byte + end byte
 const uint8_t XBEE_BUF_LENGTH = 1 + 1 + sizeof(long) + sizeof(Bmp_Data)
                               + sizeof(Mma_Data) + sizeof(Bno_Data)
-                              + sizeof(Gps_Data) + 1 + 1;
+                              + sizeof(Gps_Data) + sizeof(float) + 1 + 1;
 
 
 #endif
