@@ -115,7 +115,7 @@ while(1):
                 f_csv.write("\n")
                 f_csv.close()
                 f_csv = open(CSV_NAME, "a")
-                print("{: >10} {: >10} {: >10} {: >10} {: >10} {: >20} {: >20} {: >20} {: >5} {: >5} {: >5}".format(*data_print))
+                print("{: >10} {: >10} {: >10} {: >10} {: >10} {: >20} {: >20} {: >20} {: >5} {: >5} {: >5}".format(*data_print))s
             #except:
                 #print("Error Parsing")
 

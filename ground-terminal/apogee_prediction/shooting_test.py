@@ -2,6 +2,11 @@ import ode_solver
 import time
 import numpy as np
 import matplotlib.pyplot as plt
+from IPython import get_ipython
+ipython = get_ipython()
+backends = ['%matplotlib','%matplotlib inline']
+ipython.magic(backends[0])
+
 start_time = time.time()
 
 m2kft = 3.28084/1e3            # kft/m
