@@ -29,7 +29,7 @@ unpacks = {'event': lambda x: struct.unpack('I', x)[0],
 	'mma' : lambda x: struct.unpack('ff', x), 
 	'bmp' : lambda x: struct.unpack('ffff', x), 
 	'bno' : lambda x: struct.unpack('ffffffffffffffff', x),
-	'gps' : lambda x: struct.unpack('?fffQ', x),
+	'gps' : lambda x: struct.unpack('Qfff????', x),
 	'vbat': lambda x: struct.unpack('f', x)
 	}
 data = {'event': [], 'mma': [], 'bmp' : [], 'bno' : [], 'gps' : [], 'vbat' : []}
