@@ -71,8 +71,8 @@ while True:
             if idd == 255: break
             ne += 1
             idx += 1
-            time = struct.unpack_from('L', t, idx)[0]*10
-            dts[names[idd]].append(time)
+            time = struct.unpack_from('=L', t, idx)[0]*10
+            dts[names[idd]].append(time)  
             idx += 4
             sz = sizes[idd]
             content = unpacks[names[idd]](t[idx:idx+sz])

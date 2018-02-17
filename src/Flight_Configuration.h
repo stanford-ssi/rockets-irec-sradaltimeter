@@ -10,7 +10,7 @@ Date: 1-6-2017
 #include <stdint.h>
 #include <QuickGPS.h>
 
-#include "Skybass_Rev1.h" // change for which rev the board is
+#include "Skybass_Rev2.h" // change for which rev the board is
 //#define SITL_ON    //toggle this to turn on SITL testing
 //#define _DEBUG_    //toggle this to put into debug mode
 #define _BUZZER_   //toggle this to enable buzzer

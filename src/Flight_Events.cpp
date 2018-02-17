@@ -34,7 +34,7 @@ void Flight_Events::updateClk(void){
   }
 
   /* stuff that always should run*/
-  altimeter.transmitXbee();
+  //altimeter.transmitXbee();
 
   main_precounter++;
   if(main_precounter == UPDATE_CLK_FREQ_HZ/MAIN_FREQ){

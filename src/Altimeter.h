@@ -19,6 +19,8 @@
 #include "Logger.h"
 #include "Altitude_Filter.h"
 #include "Average.h"
+#include "Hermes.h"
+#include "hermes_irec.h"
 
 
 class Altimeter{
@@ -64,7 +66,7 @@ private:
   uint8_t transmit_counter = 0;
   uint8_t xbee_buf[XBEE_BUF_LENGTH];
   uint8_t xbee_buf_head;
-
+  Hermes Hermes1();
   //transitions variables
   bool liftoff_accel = false;
 };

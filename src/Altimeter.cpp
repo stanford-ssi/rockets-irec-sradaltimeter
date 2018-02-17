@@ -38,25 +38,25 @@ void Altimeter::eventHandle(event_t event){
   if(event == EVENT_READ_BNO){
     Bno_Data bno_data = flight_sensors.readBNO();
     flight_data.updateBNO(bno_data);
-    logger.log_variable(LOG_BNO, &bno_data, flight_data.getGlobaltime());
+    //logger.log_variable(LOG_BNO, &bno_data, flight_data.getGlobaltime());
     return;
   }
   if(event == EVENT_READ_BMP){
     Bmp_Data bmp_data = flight_sensors.readBMP();
     flight_data.updateBMP(bmp_data);
-    logger.log_variable(LOG_BMP, &bmp_data, flight_data.getGlobaltime());
+    //logger.log_variable(LOG_BMP, &bmp_data, flight_data.getGlobaltime());
     return;
   }
   if(event == EVENT_READ_MMA){
     Mma_Data mma_data = flight_sensors.readMMA();
     flight_data.updateMMA(mma_data);
-    logger.log_variable(LOG_MMA, &mma_data, flight_data.getGlobaltime());
+    //logger.log_variable(LOG_MMA, &mma_data, flight_data.getGlobaltime());
     return;
   }
   if(event == EVENT_READ_GPS){
     Gps_Data gps_data = flight_sensors.readGPS();
     flight_data.updateGPS(gps_data);
-    logger.log_variable(LOG_GPS, &gps_data, flight_data.getGlobaltime());
+    //logger.log_variable(LOG_GPS, &gps_data, flight_data.getGlobaltime());
     return;
   }
   if(event == EVENT_BUZZER){
@@ -78,7 +78,6 @@ void Altimeter::startup(){
   buzzOff();
   buzzInidicate(false);
   Serial.begin(115200);   //usb Serial
-  xbeeSerial.begin(115200);  //xbee Serial
   pinMode(LED_1, OUTPUT);
   pinMode(LED_2, OUTPUT);
   pinMode(LED_3, OUTPUT);
@@ -133,15 +132,31 @@ void Altimeter::startup(){
 void Altimeter::mainUpdate(){
   flight_sensors.update();
   float vbat = flight_sensors.readVbat();
-  logger.log_variable(LOG_VBAT, &vbat, flight_data.getGlobaltime());
-  logger.log();
+  //logger.log_variable(LOG_VBAT, &vbat, flight_data.getGlobaltime());
+  //logger.log();
   manageLEDs();
 
 
   transmit_counter++;
-  if((transmit_counter == 10)||(flight_state == ARMED)||(flight_state == PWRD_FLGHT)){
+  if((transmit_counter == 4)||(flight_state == ARMED)||(flight_state == PWRD_FLGHT)){
     transmit_counter = 0;
-    setXbeeBuffer();
+    //jank
+    long gtime = flight_data.getGlobaltime();
+    Bmp_Data bmp = flight_data.getBMPdata();
+    Mma_Data mma = flight_data.getMMAdata();
+    Bno_Data bno = flight_data.getBNOdata();
+    Gps_Data gps = flight_data.getGPSdata();
+    float vbat = flight_sensors.readVbat();
+    skybass_data_t lol;
+    lol.packet_num = 10;       //number of main loop cycles, about 24 hours @ 3hz
+    lol.altitude = (bmp.pressure1 + bmp.pressure2)/2;     //meters
+    lol.state = flight_state;      //4 bits, of skybass state and error
+    lol.batt_voltage = vbat; //in volts
+    lol.latitude = gps.lat;
+    lol.longitude = gps.lon;
+    lol.gps_locked = gps.lock;
+
+    //setXbeeBuffer();
   }
 
   /*
@@ -236,6 +251,7 @@ void Altimeter::transmitXbee(){
       break;
     }
     xbeeSerial.write(xbee_buf[xbee_buf_head]);
+    //Serial.println("LOL");
     xbee_buf_head++;
   }
 }
@@ -295,6 +311,7 @@ void Altimeter::buzzInidicate(bool buzz){
   } else {
     analogWriteFrequency(BUZZER, BUZZ_TONE_MID);
   }
+  //COMMENT OUT TO DISABLE THE BUZZER
   analogWrite(BUZZER, 128);
 }
 
