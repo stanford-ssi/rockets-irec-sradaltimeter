@@ -5,7 +5,7 @@ Date: 1-6-2017
 */
 
 #include "Flight_Data.h"
-#include "utils.h"
+#include "Utils.h"
 
  /*Flight_Data::Flight_Data() {
 
@@ -14,6 +14,8 @@ Date: 1-6-2017
 bool Flight_Data::initialize(){
   global_time = 0;
   bool success = true;
+  updateBMP(bmp_default);
+  updateMMA(mma_default);
   return success;
 }
 void Flight_Data::updateESense(byte esense){
@@ -34,6 +36,7 @@ void Flight_Data::updateMMA(Mma_Data mma_data){
 
 void Flight_Data::updateBNO(Bno_Data bno_data){
   bno_array.push(bno_data);
+  biquad_alt = alt_biquad.update(getBMPalt());
 }
 
 void Flight_Data::updateGPS(Gps_Data gps_data){
@@ -70,6 +73,5 @@ float Flight_Data::getBMPalt(){
   float p = (data.pressure1 + data.pressure2)/2;
   return p2alt(p);
 }
-
 
 /* ----- Circular_Storage_Buffer ------ */

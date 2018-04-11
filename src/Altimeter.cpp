@@ -3,7 +3,7 @@
 #include "Logger.h"
 #include "Flight_Configuration.h"
 #include "Flight_Data.h"
-#include "utils.h"
+#include "Utils.h"
 
 /*
   This is the only function that runs in the while(1) loop in main.cpp. It simply
@@ -37,26 +37,36 @@ void Altimeter::eventHandle(event_t event){
   }
   if(event == EVENT_READ_BNO){
     Bno_Data bno_data = flight_sensors.readBNO();
+    //Bno_Data bno_data;
     flight_data.updateBNO(bno_data);
-    //logger.log_variable(LOG_BNO, &bno_data, flight_data.getGlobaltime());
+    #ifdef _LOG_
+    logger.log_variable(LOG_BNO, &bno_data, flight_data.getGlobaltime());
+    #endif
     return;
   }
   if(event == EVENT_READ_BMP){
     Bmp_Data bmp_data = flight_sensors.readBMP();
+    //Serial.printf("%f,%f,%f,%f\n",bmp_data.pressure1,bmp_data.temp1,bmp_data.pressure2,bmp_data.temp2);
     flight_data.updateBMP(bmp_data);
-    //logger.log_variable(LOG_BMP, &bmp_data, flight_data.getGlobaltime());
+    #ifdef _LOG_
+    logger.log_variable(LOG_BMP, &bmp_data, flight_data.getGlobaltime());
+    #endif
     return;
   }
   if(event == EVENT_READ_MMA){
     Mma_Data mma_data = flight_sensors.readMMA();
     flight_data.updateMMA(mma_data);
-    //logger.log_variable(LOG_MMA, &mma_data, flight_data.getGlobaltime());
+    #ifdef _LOG_
+    logger.log_variable(LOG_MMA, &mma_data, flight_data.getGlobaltime());
+    #endif
     return;
   }
   if(event == EVENT_READ_GPS){
     Gps_Data gps_data = flight_sensors.readGPS();
     flight_data.updateGPS(gps_data);
-    //logger.log_variable(LOG_GPS, &gps_data, flight_data.getGlobaltime());
+    #ifdef _LOG_
+    logger.log_variable(LOG_GPS, &gps_data, flight_data.getGlobaltime());
+    #endif
     return;
   }
   if(event == EVENT_BUZZER){
@@ -64,7 +74,7 @@ void Altimeter::eventHandle(event_t event){
     return;
   }
   if(event == EVENT_FILTER){
-    //alt_filter.update(flight_data.getBMPdata(), flight_data.getBNOdata(), flight_data.getMMAdata());
+    alt_filter.update(flight_data.getBMPdata(), flight_data.getBNOdata(), flight_data.getMMAdata());
     return;
   }
 }
@@ -78,6 +88,8 @@ void Altimeter::startup(){
   buzzOff();
   buzzInidicate(false);
   Serial.begin(115200);   //usb Serial
+  ESP_SERIAL.begin(9600);
+  //while(1){ESP_SERIAL.write(0xAA);}
   pinMode(LED_1, OUTPUT);
   pinMode(LED_2, OUTPUT);
   pinMode(LED_3, OUTPUT);
@@ -94,13 +106,18 @@ void Altimeter::startup(){
   pinMode(TRIG_2, OUTPUT);
   pinMode(TRIG_3, OUTPUT);
   pinMode(TRIG_4, OUTPUT);
+
+  //digitalWrite(TRIG_1, 1);
+  //delay(500);
+  //digitalWrite(TRIG_1, 0);
+  //while(1){}
   flight_data.initialize();
   if(flight_sensors.initialize()){
     Serial.println("Sensors initialized successfully");
   } else {
     Serial.println("Sensors not initialized successfully");
   }
-
+  #ifdef _LOG_
   /* Pessimistic approximation of the number of bytes:
    * (100 Hz)*(5 sensors)*(16 byte/sensor)*(3 hour) = 86400000 bytes.
    * Incidentally, that's the number of milliseconds in a day
@@ -115,6 +132,7 @@ void Altimeter::startup(){
   logger.init_variable(LOG_EVENT, "event", sizeof(Event_Data));
   logger.init_variable(LOG_VBAT, "vbat", sizeof(float));
   logger.finish_headers();
+  #endif
   flight_events.initialize();
   xbeeSerial.println("Unit Initialized");
   Serial.println("Unit Initialized");
@@ -123,6 +141,7 @@ void Altimeter::startup(){
   buzzOff();
 
   flight_state = IDLE;
+
 }
 
 /*
@@ -131,16 +150,17 @@ void Altimeter::startup(){
 */
 void Altimeter::mainUpdate(){
   flight_sensors.update();
-  float vbat = flight_sensors.readVbat();
   //logger.log_variable(LOG_VBAT, &vbat, flight_data.getGlobaltime());
-  //logger.log();
+  #ifdef _LOG_
+  logger.log();
+  #endif
   manageLEDs();
 
-
   transmit_counter++;
-  if((transmit_counter == 4)||(flight_state == ARMED)||(flight_state == PWRD_FLGHT)){
+  if((transmit_counter == 4)||(flight_state == ARMED)||(flight_state == FLIGHT)){
     transmit_counter = 0;
     //jank
+    Hermes Hermes1(Serial3);
     long gtime = flight_data.getGlobaltime();
     Bmp_Data bmp = flight_data.getBMPdata();
     Mma_Data mma = flight_data.getMMAdata();
@@ -148,26 +168,18 @@ void Altimeter::mainUpdate(){
     Gps_Data gps = flight_data.getGPSdata();
     float vbat = flight_sensors.readVbat();
     skybass_data_t lol;
-    lol.packet_num = 10;       //number of main loop cycles, about 24 hours @ 3hz
-    lol.altitude = (bmp.pressure1 + bmp.pressure2)/2;     //meters
+    lol.packet_num = (flight_data.getGlobaltime()/1000) % 262143;       //number of main loop cycles, about 24 hours @ 3hz
+    lol.altitude = flight_data.getBMPalt();     //meters
     lol.state = flight_state;      //4 bits, of skybass state and error
     lol.batt_voltage = vbat; //in volts
     lol.latitude = gps.lat;
     lol.longitude = gps.lon;
     lol.gps_locked = gps.lock;
-
+    Hermes1.sendSkybassData(lol);
     //setXbeeBuffer();
   }
 
-  /*
-  Bno_Data bno = flight_data.getBNOdata();
-  Serial.print(", x: ");
-  Serial.print(bno.euler.x);
-  Serial.print(", y: ");
-  Serial.print(bno.euler.y);
-  Serial.print(", z: ");
-  Serial.println(bno.euler.z);
-  */
+  Serial.printf("h:%f v:%f rh:%f bh:%f t:%f,%f, s:%d\n",alt_filter.getAltitude(),alt_filter.getVelocity(),flight_data.getBMPalt(),flight_data.biquad_alt,float(flight_data.flight_time)/1000000,float(flight_data.appo_time)/1000000,flight_state);
 
   Gps_Data g = flight_data.getGPSdata();
   if(g.lock) digitalWrite(LED_2, true);
@@ -176,28 +188,44 @@ void Altimeter::mainUpdate(){
   if(flight_state == ARMED) digitalWrite(LED_1, true);
   else digitalWrite(LED_1, false);
 
+  manageEmatches();
 
   switch(flight_state){
     case IDLE:
       if(checkOnRail()){
         flight_state = ARMED;
-        flight_data.launchpad_alt = flight_data.getBMPalt();
+        flight_data.launchpad_alt = flight_data.biquad_alt;
       }
       break;
     case ARMED:
       if(!checkOnRail())flight_state = IDLE;
-      //if(checkLiftoff())flight_state = PWRD_FLGHT;
+      if(checkLiftoff()){
+        flight_state = FLIGHT;
+        flight_data.flight_time = 0;
+      }
       break;
-    case PWRD_FLGHT:
-      //if(checkLowAlt())flight_state = RCVRED;
+    case FLIGHT:
+      if(flight_data.flight_time > MIN_FLIGHT_TIME*1000000){
+        if(alt_filter.getVelocity() < 10*RECOVERY_SEP_TIME){
+          recoveryEvent(SEP);
+        }
+        if(alt_filter.getVelocity() < 0){
+          flight_state = DESCNT;
+          flight_data.appo_time = flight_data.flight_time;
+        }
+      }
       break;
-    case COAST:
-      break;
-    case DESCNT_DROG:
-      break;
-    case DESCNT_MAIN:
-      break;
-    case PRE_RCVRY:
+    case DESCNT:
+
+      if(flight_data.flight_time - flight_data.appo_time > RECOVERY_DROGUE_TIME*1000000){
+        recoveryEvent(DROGUE);
+      }
+      if(flight_data.flight_time - flight_data.appo_time > RECOVERY_SEP_BACKUP_TIME*1000000){
+        recoveryEvent(SEP_BACKUP);
+      }
+      if((flight_data.biquad_alt - flight_data.launchpad_alt < RECOVERY_MAIN_ALT) && (flight_data.flight_time - flight_data.appo_time > RECOVERY_MAIN_MIN_DELAY*1000000)){
+        recoveryEvent(MAIN);
+      }
       break;
     case RCVRED:
       break;
@@ -352,24 +380,50 @@ bool Altimeter::checkLiftoff(){
   int len = flight_data.mma_array.store_freq; //this will get one second of the array
   Mma_Data mma[len];
   flight_data.mma_array.getArray(mma, len);
-  int dv = 0;
+  float dv = 0;
   for(int i = 0; i<len;i++){
-    dv += i;
+    dv += mma[i].y;
   }
   if(dv/len > LIFTOFF_DV_MIN) liftoff_accel = true;
-  return (liftoff_accel && ((flight_data.getBMPalt()-flight_data.launchpad_alt) > LIFTOFF_ALT_MIN));
+  Serial.printf("%f ",dv/len);
+  return (liftoff_accel);
 }
 
-bool Altimeter::checkLowAlt(){
-  int len = flight_data.bmp_array.array_length;
-  Bmp_Data data[len];
-  Average<float> alt(len);
-  flight_data.bmp_array.getArray(data,len);
-  for(int i = 0;i<len;i++){
-    float a = p2alt((data[i].pressure1 + data[i].pressure2)/2);
-    alt.push(a);
+void Altimeter::recoveryEvent(int event){
+  if(event==MAIN && !(event_hist&(1<<event))){
+    Serial.printf("MAIN EVENT\n");
+    ematch_triggers = ematch_triggers | (1<<1);
+    event_hist = event_hist|(1<<event);
   }
-  float avg_alt = alt.mean() - flight_data.launchpad_alt;
-  Serial.println(avg_alt);
-  return avg_alt < RECOVERY_MAX_ALT;
+  if(event==DROGUE && !(event_hist&(1<<event))){
+    Serial.printf("DROGUE EVENT\n");
+    ematch_triggers = ematch_triggers | (1<<0);
+    event_hist = event_hist|(1<<event);
+  }
+  if(event==SEP_BACKUP && !(event_hist&(1<<event))){
+    Serial.printf("SEP_BACKUP EVENT\n");
+    ematch_triggers = ematch_triggers | (1<<2);
+    event_hist = event_hist|(1<<event);
+  }
+  if(event==SEP && !(event_hist&(1<<event))){
+    Serial.printf("SEP EVENT\n");
+    ESP_SERIAL.write(0xAA);
+    event_hist = event_hist|(1<<event);
+  }
+}
+
+void Altimeter::manageEmatches(){
+  for(int i = 0; i < NUM_EMATCHES; i++){
+    if(ematch_triggers&(1<<i))ematch_counters[i] = MAIN_FREQ;
+  }
+  ematch_triggers = 0;
+  for(int i = 0; i < NUM_EMATCHES; i++){
+    if(ematch_counters[i] > 0){
+      ematch_counters[i]--;
+      digitalWrite(ematch_pins[i],1);
+      digitalWrite(LED_3,1);
+    } else {
+      digitalWrite(ematch_pins[i],0);
+    }
+  }
 }

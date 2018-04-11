@@ -1,20 +1,16 @@
 import sys
 import glob
-import serial
 import struct
 import numpy
+import serial
 import csv
+import defs
+import pickle
+from defs import *
+FILE_PATH = './realdata/data.pickle'
 
-FILE_PATH = './fakedata/fake1.csv'
 
-
-FSTART      = b'\xaa'
-FESENSE     = 1
-FISOSENSE   = 2
-FBNO        = 3
-FMMA        = 4
-FBMP        = 5 
-FGPS		= 6
+formats = {FBMP:'ffff', FMMA:'ff',FBNO:'ffffffffffffffff',FGPS:'Qfffi',FVBAT:'f'}
 
 def serial_ports():
     """ Lists serial port names
@@ -33,7 +29,6 @@ def serial_ports():
         ports = glob.glob('/dev/tty.*')
     else:
         raise EnvironmentError('Unsupported platform')
-
     result = []
     for port in ports:
         try:
@@ -44,66 +39,52 @@ def serial_ports():
             pass
     return result
 
+#print(serial_ports())
+#exit()
 
 if __name__ == '__main__':
-	#reading CSV file into memory, sorting into arrays for each sensr
-	with open(FILE_PATH, 'r') as f:
-		reader = csv.reader(f)
-		data_as_list = list(reader)
-	bmp_data = []
-	for i in range(0, len(data_as_list)):
-		row = [float(i) for i in data_as_list[i]]
-		if row[0] == 3:
-			bmp_data.append(row[1:4])
-	bmp_data = numpy.asarray((bmp_data))
-	print(bmp_data)
-	#all_data = numpy.genfromtxt(FILE_PATH, delimiter=',')
-	#bno_data = all_data[all_data[:,0] == 3.0, :][:,1:3]
 
-	print(serial_ports())
-	teensy = serial.Serial('COM5')
+
+	#reading CSV file into memory, sorting into arrays for each sensr
+	with open(FILE_PATH, 'rb') as f:
+		data = pickle.load(f)
+	if 0:
+		sensor = FBMP
+		time=0
+		ind = data[sensor].index.get_loc(time,method='nearest')
+		dat = [data[sensor][k].iloc[ind] for k in data[sensor].keys()]
+		fetch = struct.pack(formats[sensor],*dat)
+		print(':'.join([hex(k) for k in fetch]))
+		exit()
+		
+	teensy = serial.Serial('/dev/ttyACM0')
 	#wait for teensy configured for SITL testing
 	while(1):
 		read = teensy.read(1)
 		print(read)
 		if read == FSTART:
-			print('SALT found ready for SITL testing')
+			print('>>> Skybass found ready for SITL testing')
 			teensy.write(FSTART)
 			break
 	while(1):
-		request = teensy.read(5)
-		sensor = request[0]
-		time = struct.unpack('f',request[1:5])
-		if sensor == FBMP:
-			print('SALT Requesting BMP data')
-			ind = numpy.searchsorted(bmp_data[:,0],time)
-			print(bmp_data[ind-1,0])
-			if abs(time - bmp_data[ind,0]) > abs(time - bmp_data[ind-1,0]):
-				ind += 1
-			fetch = struct.pack('ff',bmp_data[ind,1],bmp_data[ind,2])
-			teensy.write(fetch)
+		read = teensy.read(1) 
 
-		if sensor == FISOSENSE:
-			fetch = struct.pack('x') #garbage byte
-			teensy.write(fetch)
+		if read == FSTART:
+			request = teensy.read(5)
+			sensor = request[0]
+			#print(">>>Sensor Requested: ", sensor)
+			time = struct.unpack('f',request[1:5])
+			if sensor == FVBAT:
+				fetch = struct.pack('f',3.8)
+				teensy.write(fetch)
+			else:
+				ind = data[sensor].index.get_loc(time,method='nearest')
+				dat = [data[sensor][k].iloc[ind] for k in data[sensor].keys()]
+				fetch = struct.pack(formats[sensor],*dat)
+				teensy.write(fetch)	
 
-		if sensor == FESENSE:
-			fetch = struct.pack('x') #garbage byte
-			teensy.write(fetch)
-
-
-		if sensor == FBNO:
-			fetch struct.pack('ff',0.0, 0.0)
-			teensy.write(fetch)
-
-
-		if sensor == FMMA:
-			fetch struct.pack('ff',0.0, 0.0)
-			teensy.write(fetch)
-
-		if sensor == FGPS:
-			fetch struct.pack('ff',0.0, 0.0)
-			teensy.write(fetch)
+		else: 
+			print(read.decode("utf-8"),end='')
 
 
         

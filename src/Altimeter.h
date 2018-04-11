@@ -21,7 +21,7 @@
 #include "Average.h"
 #include "Hermes.h"
 #include "hermes_irec.h"
-
+#include "Utils.h"
 
 class Altimeter{
 public:
@@ -42,7 +42,9 @@ public:
   uint8_t led_counter = 0;          //counter used to blink the led
   uint8_t buzzer_counter;           //counter used to buzz the buzzer
   uint8_t buzzer_freq_scaler;       //counter used to act as a scaler on the buzzer frequency
-
+  uint8_t ematch_triggers = 0;
+  int ematch_counters[4] = {0,0,0,0};
+  uint8_t event_hist = 0;
   void manageEvents();
   void startup();
   void transmitXbee();
@@ -53,6 +55,7 @@ private:
   void mainUpdate();
   void manageBuzzer();
   void manageLEDs();
+  void manageEmatches();
   void logData();
   void buzzInidicate(bool buzz);
   void buzzOff();
@@ -62,11 +65,11 @@ private:
   bool checkOnRail();
   bool checkLiftoff();
   bool checkLowAlt();
-
+  void recoveryEvent(int event);
   uint8_t transmit_counter = 0;
   uint8_t xbee_buf[XBEE_BUF_LENGTH];
   uint8_t xbee_buf_head;
-  Hermes Hermes1();
+
   //transitions variables
   bool liftoff_accel = false;
 };

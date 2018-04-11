@@ -8,21 +8,21 @@ uint8_t RADIO_END_SEQUENCE[] = {162, 98, 128, 161};
 Hermes::Hermes(HardwareSerial serial)
 {
     serialPort = serial;
-    serialPort.begin(Hermes::baud);
+    Serial3.begin(Hermes::baud);
 }
 
 void Hermes::send(hermes_data_t &data_struct)
 {
     uint8_t data[data_struct.getSize()];
     memcpy(data, &data_struct, data_struct.getSize());
-    serialPort.write(data, data_struct.getSize());
+    Serial3.write(data, data_struct.getSize());
 }
 
 void Hermes::sendSkybassData(hermes_data_t &data_struct)
 {
-    serialPort.write(RADIO_START_SEQUENCE, 4);
+    Serial3.write(RADIO_START_SEQUENCE, 4);
     send(data_struct);
-    serialPort.write(RADIO_END_SEQUENCE, 4);
+    Serial3.write(RADIO_END_SEQUENCE, 4);
 }
 
 bool Hermes::receiveSkybassData(hermes_data_t &data_struct)

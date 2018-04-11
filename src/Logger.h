@@ -28,7 +28,11 @@ private:
 
   SdFat sd;
   SdBaseFile binFile;
+  #ifdef SITL_ON
+  char fileName[14] = "sitl00.bin";
+  #else
   char fileName[14] = "data00.bin";
+  #endif
   uint32_t bgnBlock, endBlock;
   uint32_t curBlock;
 

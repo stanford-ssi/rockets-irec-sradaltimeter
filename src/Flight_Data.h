@@ -12,6 +12,7 @@ Date: 1-6-2017
 
 #include <WProgram.h>
 #include "Flight_Configuration.h"
+#include "Utils.h"
 
 
 
@@ -119,7 +120,15 @@ public:
     bno_array(BNO_FREQ, DEFAULT_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
     gps_array(GPS_FREQ, DEFAULT_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
     esense_array(MAIN_FREQ, DEFAULT_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
-    isosense_array(MAIN_FREQ, DEFAULT_STORE_FREQ, DEFAULT_ARRAY_LENGTH) {};
+    isosense_array(MAIN_FREQ, DEFAULT_STORE_FREQ, DEFAULT_ARRAY_LENGTH),
+
+    /*
+     * biquad coeffs for lowpass filter
+     * If you fuck with these constants, valbal (yes valbal), will fall out of the sky.
+     */
+    alt_biquad({{1.1253332335643043, -1.9842294026289558, 0.87466676643569574}, {0.003942649342761062, 0.0078852986855221241, 0.003942649342761062}})
+    {};
+
 
   bool initialize();
   void updateESense(byte esense);
@@ -136,6 +145,7 @@ public:
   Gps_Data getGPSdata();
   unsigned long getGlobaltime();
   float getBMPalt();
+  float biquad_alt = 0;
 
   Circular_Array<Bmp_Data> bmp_array;
   Circular_Array<Mma_Data> mma_array;
@@ -145,16 +155,16 @@ public:
   Circular_Array<byte> isosense_array;
 
   float launchpad_alt;
-private:
-
-  elapsedMicros global_time;
+  long appo_time;
   elapsedMicros flight_time;
+  elapsedMicros global_time;
+private:
   Bmp_Data bmp_data;
   Mma_Data mma_data;
   Bno_Data bno_data;
   byte iso_sense;
   byte esense;
-
+  Biquad alt_biquad;
 };
 
 

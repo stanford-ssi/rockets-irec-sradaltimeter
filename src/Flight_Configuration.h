@@ -14,7 +14,7 @@ Date: 1-6-2017
 //#define SITL_ON    //toggle this to turn on SITL testing
 //#define _DEBUG_    //toggle this to put into debug mode
 #define _BUZZER_   //toggle this to enable buzzer
-
+#define _LOG_      //toggle this to enable logging
 
 /* Frequency settings. Values are in Hz */
 #define UPDATE_CLK_FREQ_HZ  100      //frequency of the update "clock"
@@ -36,7 +36,12 @@ Date: 1-6-2017
 #define LAUNCH_ANGLE_STD_MAX 1.0
 #define LIFTOFF_DV_MIN 50
 #define LIFTOFF_ALT_MIN 100
-#define RECOVERY_MAX_ALT 1000
+#define RECOVERY_MAIN_ALT 1500        // Altitude to deplot main at, in m
+#define RECOVERY_MAIN_MIN_DELAY 10  // Minumum time after appogee for main to delpoy
+#define RECOVERY_DROGUE_TIME 2      // Time delay after appo for Drogue
+#define RECOVERY_SEP_TIME 2          // Time BEFORE appo for Sep
+#define RECOVERY_SEP_BACKUP_TIME 1   // Time delay after appo for Sep
+#define MIN_FLIGHT_TIME 5         // Minimum time from liftoff to appogee, in seconds
 
 /*settings for indicating sensors*/
 #define FSTART       0xAA
@@ -55,10 +60,8 @@ enum {
   STRTUP,
   IDLE,
   ARMED,
-  PWRD_FLGHT,
-  COAST,
-  DESCNT_DROG,
-  DESCNT_MAIN,
+  FLIGHT,
+  DESCNT,
   PRE_RCVRY,
   RCVRED,
 };
@@ -75,8 +78,17 @@ typedef enum {
   EVENT_READ_BNO =  0b01000000, //64
 } event_t;
 
+// enumeration of event
+enum {
+  MAIN,
+  DROGUE,
+  SEP,
+  SEP_BACKUP,
+};
 
-
+//pins for ematch channels
+#define NUM_EMATCHES 4
+const int ematch_pins[4] = {TRIG_1,TRIG_2,TRIG_3,TRIG_4};
 
 // some structures for handeling data
 typedef QuickGPS::Data Gps_Data;
@@ -96,10 +108,14 @@ typedef struct{
   float temp2;
 } Bmp_Data;
 
+const Bmp_Data bmp_default = {100000,50,100000,50};
+
 typedef struct{
   float x;
   float y;
 } Mma_Data;
+
+const Mma_Data mma_default = {0,0};
 
 typedef struct{
   struct{

@@ -9,8 +9,7 @@
 class SITL{
 public:
   bool initialize();
-  bool update();
-
+  bool update(){return true;}
   byte readESense();
   byte readIsoSense();
   Mma_Data readMMA();
@@ -24,13 +23,17 @@ private:
   template <typename T>
   void getData(T* dat){
     const int len = sizeof(*dat);
+    //Serial.printf("Gimme: %d\n",len);
     char bytes[len];
     while(true){
       if(Serial.available() == len){
         for(int i = 0;i < len; i++){
           bytes[i]= Serial.read();
+          //Serial.printf("%x,",bytes[i]);
         }
-        memcpy(bytes,dat,len);
+        memcpy(dat,bytes,len);
+        //Serial.printf("\n");
+        return;
       }
     }
   }
@@ -38,7 +41,7 @@ private:
   void float2Bytes(float val, byte* bytes_array);
   float bytes2Float(byte* bytes_array);
   void request(byte select);
-  byte requestMsg[5];
+  byte requestMsg[6];
   elapsedMicros global_time;
 };
 

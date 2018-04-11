@@ -6,6 +6,7 @@
 
 bool SITL::initialize(){
   bool sucessful = true;
+  requestMsg[0] = FSTART;
   //holds until connection with PC is established
   while(true){
     Serial.write(FSTART);
@@ -63,9 +64,9 @@ float SITL::readVbat(){
 }
 
 void SITL::request(byte select){
-  float2Bytes(float (global_time),(requestMsg+1));
-  requestMsg[0] = select;
-  Serial.write(requestMsg,5);
+  float2Bytes(float (global_time),(requestMsg+2));
+  requestMsg[1] = select;
+  Serial.write(requestMsg,6);
 }
 
 void SITL::float2Bytes(float val, byte* bytes_array){

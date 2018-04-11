@@ -29,8 +29,8 @@ bool Flight_Events::check(uint8_t EVENT){
 
 void Flight_Events::updateClk(void){
   if(processor_busy){
-    Serial.print("LC:");
-    Serial.println(processor_busy);
+    //Serial.print("LC:");
+    //Serial.println(processor_busy);
   }
 
   /* stuff that always should run*/

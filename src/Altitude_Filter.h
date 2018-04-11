@@ -9,6 +9,7 @@ This file defines the class for the altitude kalman filter. Not implemented yet.
 #include <Eigen30.h>
 #include <Eigen/Dense>
 #include "Flight_Configuration.h"
+#include "Utils.h"
 
 //configuration options
 #define VAR_BMP 0.5
@@ -20,7 +21,7 @@ public:
   Altitude_Filter();
   void update(Bmp_Data bmp_data, Bno_Data bno_data, Mma_Data mma_data);
   float getAltitude();
-
+  float getVelocity();
 private:
 
   Vector3f X;

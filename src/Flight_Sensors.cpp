@@ -11,7 +11,7 @@ Date: 1-6-2017
 Flight_Sensors::Flight_Sensors()
   : bmp1(Adafruit_BMP280(BMP1_CS)),
     bmp2(Adafruit_BMP280(BMP2_CS)),
-    bno(Adafruit_BNO055(55)),
+    bno(Adafruit_BNO055(55,0x28)),
     mma(MMA65XX_Sensor(MMA_CS)),
     gps(&GPS_SERIAL) {}
 
