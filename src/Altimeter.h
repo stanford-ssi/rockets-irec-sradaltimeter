@@ -72,6 +72,7 @@ private:
 
   //transitions variables
   bool liftoff_accel = false;
+  void breakRocket();
 };
 
 

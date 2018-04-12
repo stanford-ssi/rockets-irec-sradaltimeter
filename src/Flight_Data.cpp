@@ -36,7 +36,8 @@ void Flight_Data::updateMMA(Mma_Data mma_data){
 
 void Flight_Data::updateBNO(Bno_Data bno_data){
   bno_array.push(bno_data);
-  biquad_alt = alt_biquad.update(getBMPalt());
+  float h = getBMPalt();
+  biquad_alt = alt_biquad.update(h);
 }
 
 void Flight_Data::updateGPS(Gps_Data gps_data){

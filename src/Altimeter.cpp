@@ -70,7 +70,8 @@ void Altimeter::eventHandle(event_t event){
     return;
   }
   if(event == EVENT_BUZZER){
-    manageBuzzer();
+    if(flight_state < FLIGHT) manageBuzzer();
+    else buzzOff();
     return;
   }
   if(event == EVENT_FILTER){
@@ -89,6 +90,8 @@ void Altimeter::startup(){
   buzzInidicate(false);
   Serial.begin(115200);   //usb Serial
   ESP_SERIAL.begin(9600);
+
+
   //while(1){ESP_SERIAL.write(0xAA);}
   pinMode(LED_1, OUTPUT);
   pinMode(LED_2, OUTPUT);
@@ -134,7 +137,7 @@ void Altimeter::startup(){
   logger.finish_headers();
   #endif
   flight_events.initialize();
-  xbeeSerial.println("Unit Initialized");
+  //xbeeSerial.println("Unit Initialized");
   Serial.println("Unit Initialized");
   buzzInidicate(true);
   delay(100);
@@ -180,6 +183,10 @@ void Altimeter::mainUpdate(){
   }
 
   Serial.printf("h:%f v:%f rh:%f bh:%f t:%f,%f, s:%d\n",alt_filter.getAltitude(),alt_filter.getVelocity(),flight_data.getBMPalt(),flight_data.biquad_alt,float(flight_data.flight_time)/1000000,float(flight_data.appo_time)/1000000,flight_state);
+  byte sense = flight_sensors.readESense();
+  flight_data.updateESense(sense);
+  if((sense&(1<<0))&&(sense&(1<<1))&&(sense&(1<<2))) digitalWrite(LED_3, true);
+  else digitalWrite(LED_3, false);
 
   Gps_Data g = flight_data.getGPSdata();
   if(g.lock) digitalWrite(LED_2, true);
@@ -317,6 +324,18 @@ void Altimeter::manageBuzzer(){
     case 8:
       buzzInidicate(flight_data.getGPSdata().lock);
       break;
+    case 12:
+      buzzInidicate(flight_sensors.readESense() & (1<<0));
+      break;
+    case 14:
+      buzzInidicate(flight_sensors.readESense() & (1<<1));
+      break;
+    case 16:
+      buzzInidicate(flight_sensors.readESense() & (1<<2));
+      break;
+    case 18:
+      buzzInidicate(flight_sensors.readESense() & (1<<3));
+      break;
     default:
       buzzOff();
       break;
@@ -427,3 +446,18 @@ void Altimeter::manageEmatches(){
     }
   }
 }
+
+/*
+ * Breaks the rocket.
+ * Do NOT call this function.
+ * Definitely a bad idea.
+ */
+void Altimeter::breakRocket(){
+  ESP_SERIAL.write(0xAA);
+  digitalWrite(TRIG_1, 1);
+  digitalWrite(TRIG_2, 1);
+  digitalWrite(TRIG_3, 1);
+  digitalWrite(TRIG_4, 1);
+  while(1);
+}
+// unless you like fun.

@@ -20,7 +20,7 @@ bool SITL::initialize(){
 }
 
 byte SITL::readESense(){
-  return 0;
+  return 0b00000111;
 }
 
 byte SITL::readIsoSense(){

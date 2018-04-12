@@ -54,10 +54,10 @@ bool Flight_Sensors::update() {
 
 byte Flight_Sensors::readESense(){
   byte esense_array = 0;
-  if(digitalReadFast(ESENSE_1)){esense_array|=(1<<7);}
-  if(digitalReadFast(ESENSE_2)){esense_array|=(1<<6);}
-  if(digitalReadFast(ESENSE_3)){esense_array|=(1<<5);}
-  if(digitalReadFast(ESENSE_4)){esense_array|=(1<<4);}
+  if(digitalReadFast(ESENSE_1)){esense_array|=(1<<0);}
+  if(digitalReadFast(ESENSE_2)){esense_array|=(1<<1);}
+  if(digitalReadFast(ESENSE_3)){esense_array|=(1<<2);}
+  if(digitalReadFast(ESENSE_4)){esense_array|=(1<<3);}
   return esense_array;
 }
 
