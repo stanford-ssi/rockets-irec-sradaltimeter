@@ -197,16 +197,16 @@ void Altimeter::mainUpdate(){
     Bno_Data bno = flight_data.getBNOdata();
     Gps_Data gps = flight_data.getGPSdata();
     float vbat = flight_sensors.readVbat();
-  //  skybass_data_t lol;
-  //  lol.packet_num = (flight_data.getGlobaltime()/1000) % 262143;       //number of main loop cycles, about 24 hours @ 3hz
-  //  lol.altitude = flight_data.getBMPalt();     //meters
-  //  lol.state = flight_state;      //4 bits, of skybass state and error
-  //  lol.batt_voltage = vbat; //in volts
-  //  lol.latitude = gps.lat;
-  //  lol.longitude = gps.lon;
-  //  lol.gps_locked = gps.lock;
-  //  Hermes1.sendSkybassData(lol);
-    //setXbeeBuffer();
+
+   skyb_data.packet_num = (flight_data.getGlobaltime()/1000) % 262143;       //number of main loop cycles, about 24 hours @ 3hz
+  skyb_data.altitude = flight_data.getBMPalt();     //meters
+    skyb_data.state = flight_state;      //4 bits, of skybass state and error
+    skyb_data.batt_voltage = vbat; //in volts
+    skyb_data.latitude = gps.lat;
+    skyb_data.longitude = gps.lon;
+    skyb_data.gps_locked = gps.lock;
+    min_send_frame(&min_ctx_sradio,SKYB_DATA,(uint8_t *)&skyb_data,sizeof(skyb_data));
+
   }
 
   Serial.printf("h:%f v:%f rh:%f bh:%f t:%f,%f, s:%d\n",alt_filter.getAltitude(),alt_filter.getVelocity(),flight_data.getBMPalt(),flight_data.biquad_alt,float(flight_data.flight_time)/1000000,float(flight_data.appo_time)/1000000,flight_state);
