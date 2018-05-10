@@ -1,3 +1,6 @@
+#ifndef min_irec_h
+#define min_irec_h
+
 #include <Arduino.h>
 
 //this file defines the packet structs for IREC 2018. There are unused feilds. See Google Sheet for detials on each packet.
@@ -56,3 +59,4 @@ typedef struct __attribute__((__packed__)) skyb_cmd_t
   bool ematch3;
   bool ematch4;
 } skyb_cmd_t;
+#endif

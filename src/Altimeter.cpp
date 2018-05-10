@@ -6,8 +6,8 @@
 #include "Utils.h"
 //#include "min-irec.h"
 //#include "min_support.h"
-//#include "min.c"
-//#include "min.h"
+#include "min.c"
+#include "min.h"
 
 
 skyb_data_t skyb_data;
