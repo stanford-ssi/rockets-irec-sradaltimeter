@@ -19,9 +19,11 @@
 #include "Logger.h"
 #include "Altitude_Filter.h"
 #include "Average.h"
-#include "Hermes.h"
-#include "hermes_irec.h"
 #include "Utils.h"
+
+//#include "min.h"
+#include "min-irec.h"
+#include "min_support.h"
 
 class Altimeter{
 public:
