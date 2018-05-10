@@ -22,6 +22,7 @@ struct min_context min_ctx_sradio;
 struct min_context min_ctx_esp;
 uint32_t timer;
 
+void process_commands();
 void pollSerialtoMIN();
 /*
   This is the only function that runs in the while(1) loop in main.cpp. It simply
@@ -544,30 +545,63 @@ void min_application_handler(uint8_t min_id, uint8_t *min_payload, uint8_t len_p
 {
     switch (min_id)
     {
-    case SKYB_DATA:
-        if (len_payload == sizeof(skyb_data_t))
+    case SKYB_CMD:
+        //Serial.println("Got SKYB_CMD");
+        if (len_payload == sizeof(skyb_cmd_t))
         {
-            memcpy(&sb_data, min_payload, len_payload);
-            new_sb_data = true;
+            memcpy(&skyb_cmd, min_payload, len_payload);
+            process_commands();
         }
         else
         {
-            Serial.printf("Size Err: %i/%i", len_payload, sizeof(skyb_data_t));
+            Serial.printf("Size Err: %i/%i", len_payload, sizeof(skyb_cmd_t));
         }
+        break;
+    case ESP_STATUS:
+        //Serial.println("Got ESP_STATUS");
+        min_send_frame(&min_ctx_sradio, min_id, min_payload, len_payload); //forward packet
+        break;
+    case ESP_ARM:
+        //Serial.println("Got ESP_ARM");
+        min_send_frame(&min_ctx_esp, min_id, min_payload, len_payload); //forward packet
         break;
 
-    case ESP_STATUS:
-        if (len_payload == sizeof(esp_status_t))
-        {
-            memcpy(&esp_status, min_payload, len_payload);
-            new_esp_status = true;
-        }
-        else
-        {
-            Serial.printf("Size Err: %i/%i", len_payload, sizeof(esp_status_t));
-        }
+    case ESP_STAGE:
+        //Serial.println("Got ESP_STAGE");
+        min_send_frame(&min_ctx_esp, min_id, min_payload, len_payload); //forward packet
         break;
     }
+}
+void _softRestart();
+void process_commands()
+{
+    if (skyb_cmd.reset)
+    {
+      _softRestart();
+    }
+    if (skyb_cmd.ematch1)
+    {
+        digitalWrite(TRIG_1, 1);
+    }
+    if (skyb_cmd.ematch2)
+    {
+        digitalWrite(TRIG_2, 1);
+    }
+    if (skyb_cmd.ematch3)
+    {
+        digitalWrite(TRIG_3, 1);
+    }
+    if (skyb_cmd.ematch4)
+    {
+        digitalWrite(TRIG_4, 1);
+    }
+}
+#define SCB_AIRCR (*(volatile uint32_t *)0xE000ED0C) // Application Interrupt and Reset Control location
+
+void _softRestart()
+{
+  Serial.end();  //clears the serial monitor  if used
+  SCB_AIRCR = 0x05FA0004;  //write value for restart
 }
 
 /*
