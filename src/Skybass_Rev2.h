@@ -46,9 +46,14 @@ Date: 1-6-2017
 #define VSENSE        A10
 
 /* serial ports */
-#define xbeeSerial Serial3
+#define DEBUG_SERIAL Serial //USB Serial
+#define RF_SERIAL Serial3
 #define GPS_SERIAL Serial1
 #define ESP_SERIAL Serial2
+
+/* MIN Contexts*/
+#define MIN_RF 3
+#define MIN_ESP 2
 
 /* Values */
 
