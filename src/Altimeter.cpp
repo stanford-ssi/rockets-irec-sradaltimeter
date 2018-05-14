@@ -4,8 +4,6 @@
 #include "Flight_Configuration.h"
 #include "Flight_Data.h"
 #include "Utils.h"
-//#include "min-irec.h"
-//#include "min_support.h"
 #include "min.c"
 #include "min.h"
 
@@ -574,10 +572,6 @@ void min_application_handler(uint8_t min_id, uint8_t *min_payload, uint8_t len_p
 //void _softRestart();
 void process_commands()
 {
-  if (skyb_cmd.reset)
-  {
-    //  _softRestart();
-  }
   if (skyb_cmd.ematch1)
   {
     digitalWrite(TRIG_1, 1);
