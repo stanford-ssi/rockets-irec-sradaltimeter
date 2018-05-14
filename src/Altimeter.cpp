@@ -450,7 +450,6 @@ void Altimeter::recoveryEvent(int event)
   if (event == SEP && !(event_hist & (1 << event)))
   {
     Serial.printf("SEP EVENT\n");
-    //ESP_SERIAL.write(0xAA);
     event_hist = event_hist | (1 << event);
   }
 }
@@ -559,15 +558,15 @@ void min_application_handler(uint8_t min_id, uint8_t *min_payload, uint8_t len_p
     }
     break;
   case ESP_STATUS:
-    //Serial.println("Got ESP_STATUS");
+    Serial.println("Got ESP_STATUS");
     min_send_frame(&min_ctx_sradio, min_id, min_payload, len_payload); //forward packet
     break;
   case ESP_ARM:
-    //Serial.println("Got ESP_ARM");
+    Serial.println("Got ESP_ARM");
     min_send_frame(&min_ctx_esp, min_id, min_payload, len_payload); //forward packet
     break;
   case ESP_STAGE:
-    //Serial.println("Got ESP_STAGE");
+    Serial.println("Got ESP_STAGE");
     min_send_frame(&min_ctx_esp, min_id, min_payload, len_payload); //forward packet
     break;
   }
@@ -597,14 +596,6 @@ void process_commands()
   }
 }
 
-//#define SCB_AIRCR (*(volatile uint32_t *)0xE000ED0C) // Application Interrupt and Reset Control location
-
-//void _softRestart()
-//{
-//  Serial.end();           //clears the serial monitor  if used
-//  SCB_AIRCR = 0x05FA0004; //write value for restart
-//}
-
 /*
  * Breaks the rocket.
  * Do NOT call this function.
@@ -612,6 +603,7 @@ void process_commands()
  */
 void Altimeter::breakRocket()
 {
+  Serial.println("FUCK BREAKING ROCKET");
   digitalWrite(TRIG_1, 1);
   digitalWrite(TRIG_2, 1);
   digitalWrite(TRIG_3, 1);
