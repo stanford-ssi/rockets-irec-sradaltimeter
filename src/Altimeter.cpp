@@ -569,7 +569,18 @@ void min_application_handler(uint8_t min_id, uint8_t *min_payload, uint8_t len_p
     break;
   }
 }
-//void _softRestart();
+
+void breakRocket()
+{
+  Serial.println("FUCK BREAKING ROCKET");
+  digitalWrite(TRIG_1, 1);
+  digitalWrite(TRIG_2, 1);
+  digitalWrite(TRIG_3, 1);
+  digitalWrite(TRIG_4, 1);
+  while (1)
+    ;
+}
+
 void process_commands()
 {
   if (skyb_cmd.ematch1)
@@ -589,20 +600,3 @@ void process_commands()
     digitalWrite(TRIG_4, 1);
   }
 }
-
-/*
- * Breaks the rocket.
- * Do NOT call this function.
- * Definitely a bad idea.
- */
-void Altimeter::breakRocket()
-{
-  Serial.println("FUCK BREAKING ROCKET");
-  digitalWrite(TRIG_1, 1);
-  digitalWrite(TRIG_2, 1);
-  digitalWrite(TRIG_3, 1);
-  digitalWrite(TRIG_4, 1);
-  while (1)
-    ;
-}
-// unless you like fun.
