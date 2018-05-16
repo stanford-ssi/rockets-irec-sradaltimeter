@@ -14,7 +14,7 @@ Date: 1-6-2017
 //#define SITL_ON    //toggle this to turn on SITL testing
 //#define _DEBUG_    //toggle this to put into debug mode
 #define _BUZZER_   //toggle this to enable buzzer
-#define _LOG_      //toggle this to enable logging
+//#define _LOG_      //toggle this to enable logging
 
 /* Frequency settings. Values are in Hz */
 #define UPDATE_CLK_FREQ_HZ  100      //frequency of the update "clock"

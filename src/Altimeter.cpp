@@ -181,8 +181,9 @@ void Altimeter::mainUpdate(){
     Hermes1.sendSkybassData(lol);
     //setXbeeBuffer();
   }
+  Serial.printf("%f,%f\n",flight_data.getMMAdata().y,flight_data.getMMAdata().x);
+  //Serial.printf("h:%f v:%f rh:%f bh:%f t:%f,%f, s:%d\n",alt_filter.getAltitude(),alt_filter.getVelocity(),flight_data.getBMPalt(),flight_data.biquad_alt,float(flight_data.flight_time)/1000000,float(flight_data.appo_time)/1000000,flight_state);
 
-  Serial.printf("h:%f v:%f rh:%f bh:%f t:%f,%f, s:%d\n",alt_filter.getAltitude(),alt_filter.getVelocity(),flight_data.getBMPalt(),flight_data.biquad_alt,float(flight_data.flight_time)/1000000,float(flight_data.appo_time)/1000000,flight_state);
   byte sense = flight_sensors.readESense();
   flight_data.updateESense(sense);
   if((sense&(1<<0))&&(sense&(1<<1))&&(sense&(1<<2))) digitalWrite(LED_3, true);
