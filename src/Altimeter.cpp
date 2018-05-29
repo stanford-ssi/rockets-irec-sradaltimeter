@@ -544,7 +544,9 @@ void min_application_handler(uint8_t min_id, uint8_t *min_payload, uint8_t len_p
   switch (min_id)
   {
   case SKYB_CMD:
+#ifdef DEBUG_MIN
     Serial.println("Got SKYB_CMD");
+#endif
     if (len_payload == sizeof(skyb_cmd_t))
     {
       memcpy(&skyb_cmd, min_payload, len_payload);
@@ -552,19 +554,27 @@ void min_application_handler(uint8_t min_id, uint8_t *min_payload, uint8_t len_p
     }
     else
     {
+#ifdef DEBUG_MIN
       Serial.printf("Size Err: %i/%i", len_payload, sizeof(skyb_cmd_t));
+#endif
     }
     break;
   case ESP_STATUS:
+#ifdef DEBUG_MIN
     Serial.println("Got ESP_STATUS");
+#endif
     min_send_frame(&min_ctx_sradio, min_id, min_payload, len_payload); //forward packet
     break;
   case ESP_ARM:
+#ifdef DEBUG_MIN
     Serial.println("Got ESP_ARM");
+#endif
     min_send_frame(&min_ctx_esp, min_id, min_payload, len_payload); //forward packet
     break;
   case ESP_STAGE:
+#ifdef DEBUG_MIN
     Serial.println("Got ESP_STAGE");
+#endif
     min_send_frame(&min_ctx_esp, min_id, min_payload, len_payload); //forward packet
     break;
   }
