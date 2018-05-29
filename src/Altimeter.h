@@ -5,6 +5,9 @@
 #ifndef ALTIMETER_H
 #define ALTIMETER_H
 
+#define SERIAL2_TX_BUFFER_SIZE 256
+#define SERIAL3_TX_BUFFER_SIZE 256
+
 #include <WProgram.h>
 #include <stdint.h>
 #include <SPI.h>
