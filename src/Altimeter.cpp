@@ -78,7 +78,7 @@ void Altimeter::startup(){
   buzzOff();
   buzzInidicate(false);
   Serial.begin(115200);   //usb Serial
-  xbeeSerial.begin(115200);  //xbee Serial
+  xbeeSerial.begin(19200);  //xbee Serial
   pinMode(LED_1, OUTPUT);
   pinMode(LED_2, OUTPUT);
   pinMode(LED_3, OUTPUT);
@@ -102,11 +102,7 @@ void Altimeter::startup(){
     Serial.println("Sensors not initialized successfully");
   }
 
-  /* Pessimistic approximation of the number of bytes:
-   * (100 Hz)*(5 sensors)*(16 byte/sensor)*(3 hour) = 86400000 bytes.
-   * Incidentally, that's the number of milliseconds in a day
-   * without taking into account sidereal periods or leap seconds. */
-  if (logger.initialize(86400000)) {
+  if (logger.initialize(1024 * 1024 * 100)) { // 100MB
     Serial.println("Logging initialized successfully");
   }
   logger.init_variable(LOG_BMP, "bmp", sizeof(Bmp_Data));
@@ -117,7 +113,8 @@ void Altimeter::startup(){
   logger.init_variable(LOG_VBAT, "vbat", sizeof(float));
   logger.finish_headers();
   flight_events.initialize();
-  xbeeSerial.println("Unit Initialized");
+
+  xbeeSerial.println("xxxxxxxxxxxxxxxx_:skeleton:_xxxxxxxxxxxxxxxx");
   Serial.println("Unit Initialized");
   buzzInidicate(true);
   delay(100);
@@ -131,6 +128,19 @@ void Altimeter::startup(){
   differently depending on the vehicle state.
 */
 void Altimeter::mainUpdate(){
+  while (xbeeSerial.available() > 0) {
+      char in = xbeeSerial.read();
+      if (in == 'a') {
+          while (true) {
+              Serial.println("WE ARE DONE");
+              digitalWrite(TRIG_2, true);
+              digitalWrite(TRIG_3, true);
+              digitalWrite(TRIG_4, true);
+              digitalWrite(TRIG_4, true);
+          }
+      }
+  }
+
   flight_sensors.update();
   float vbat = flight_sensors.readVbat();
   logger.log_variable(LOG_VBAT, &vbat, flight_data.getGlobaltime());
