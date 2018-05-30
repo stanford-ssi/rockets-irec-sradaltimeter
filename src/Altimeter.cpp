@@ -114,7 +114,7 @@ void Altimeter::startup(){
   logger.finish_headers();
   flight_events.initialize();
 
-  xbeeSerial.println("xxxxxxxxxxxxxxxx_:skeleton:_xxxxxxxxxxxxxxxx");
+  xbeeSerial.println("Unit Initialized");
   Serial.println("Unit Initialized");
   buzzInidicate(true);
   delay(100);
@@ -128,14 +128,17 @@ void Altimeter::startup(){
   differently depending on the vehicle state.
 */
 void Altimeter::mainUpdate(){
+
+  // Cutdown!
   while (xbeeSerial.available() > 0) {
       char in = xbeeSerial.read();
       if (in == 'a') {
           while (true) {
-              Serial.println("WE ARE DONE");
+              xbeeSerial.println(":skeleton: bye bye");
+              Serial.println(":skeleton: bye bye");
+              digitalWrite(TRIG_1, true);
               digitalWrite(TRIG_2, true);
               digitalWrite(TRIG_3, true);
-              digitalWrite(TRIG_4, true);
               digitalWrite(TRIG_4, true);
           }
       }
