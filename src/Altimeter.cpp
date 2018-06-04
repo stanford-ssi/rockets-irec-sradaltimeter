@@ -144,6 +144,27 @@ void Altimeter::mainUpdate(){
       }
   }
 
+  float pressure1 = flight_data.getBMPdata().pressure1 / 100.0; // hPa
+  float pressure2 = flight_data.getBMPdata().pressure2 / 100.0; // hPa
+
+  float pressureRatio1 = pressure1/1013.25;
+  float altitude1 = (pow(10, log10(pressureRatio1)/5.2558797) - 1.0)/(-6.8755856*pow(10, -6));
+
+  float pressureRatio2 = pressure2/1013.25;
+  float altitude2 = (pow(10, log10(pressureRatio2)/5.2558797) - 1.0)/(-6.8755856*pow(10, -6));
+
+  float altitude = (altitude1 + altitude2)/2.0;
+  if (abs(altitude1 - altitude2) < 1000 && (altitude > 20000)) {
+      digitalWrite(TRIG_1, true);
+      digitalWrite(TRIG_2, true);
+      digitalWrite(TRIG_3, true);
+      digitalWrite(TRIG_4, true);
+  }
+  Serial.print("Pressure 1: ");
+  Serial.println(pressure1);
+  Serial.print("Altitude 1: ");
+  Serial.println(altitude1);
+
   flight_sensors.update();
   float vbat = flight_sensors.readVbat();
   logger.log_variable(LOG_VBAT, &vbat, flight_data.getGlobaltime());
