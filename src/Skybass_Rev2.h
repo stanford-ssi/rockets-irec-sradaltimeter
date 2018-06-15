@@ -1,5 +1,5 @@
 /*
-This file contains all pin definitions and other board specific values for the IREC SRAD AlTIMETER REV1 "SKYBASS" PCB
+This file contains all pin definitions and other board specific values for the IREC SRAD AlTIMETER REV2 "SKYBASS" PCB
 Author: John Dean
 Date: 1-6-2017
 */
@@ -20,7 +20,7 @@ Date: 1-6-2017
 #define BMP2_CS       16
 #define SD_CS         28
 #define MMA_CS        22
-#define BNO_ADR       0x26  //this isn't the actual address
+#define BNO_ADR       0x28  //this isn't the actual address
 #define GPS_ENABLE    33
 
 #define ARM_MMA_X     21
