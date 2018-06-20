@@ -36,12 +36,12 @@ Date: 1-6-2017
 
 #define TRIG_1        25
 #define TRIG_2        24
-#define TRIG_3        4
-#define TRIG_4        3
+#define TRIG_3        3
+#define TRIG_4        4
 #define ESENSE_1      26
 #define ESENSE_2      6
-#define ESENSE_3      5
-#define ESENSE_4      2
+#define ESENSE_3      2
+#define ESENSE_4      5
 
 #define VSENSE        A10
 
